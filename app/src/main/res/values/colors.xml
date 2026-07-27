@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Tus colores actuales -->
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- NUEVOS COLORES PARA NIÑOS -->
+    <color name="kids_background">#E0F7FA</color> <!-- Azul clarito muy suave -->
+    <color name="kids_primary_text">#01579B</color> <!-- Azul oscuro amable -->
+    <color name="kids_accent_orange">#FF9800</color> <!-- Naranja divertido para el botón -->
 </resources>
