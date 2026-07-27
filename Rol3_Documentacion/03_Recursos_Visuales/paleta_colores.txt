@@ -1,0 +1,4 @@
+Paleta de colores del Consultorio:
+- Primario (Azul Médico): #0066CC
+- Secundario (Verde Salud): #2ECC71
+- Fondo (Gris Claro): #F8F9FA
