@@ -87,6 +87,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             COL_INV_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
             COL_INV_NOMBRE + " TEXT NOT NULL, " +
             COL_INV_CANTIDAD + " INTEGER NOT NULL);";
+    //
+    // ==========================================
+    // 5. Tabla Usuarios
+    // ==========================================
+    public static final String TABLE_USUARIOS = "Usuarios";
+    public static final String COLUMN_ID_USUARIO = "id_usuario";
+    public static final String COLUMN_USUARIO = "usuario";
+    public static final String COLUMN_PASSWORD = "password"; // En un entorno real debería ir encriptada
+    public static final String COLUMN_ROL = "rol";
+
+
+    String CREATE_TABLE_USUARIOS = "CREATE TABLE " + TABLE_USUARIOS + "("
+            + COLUMN_ID_USUARIO + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+            + COLUMN_USUARIO + " TEXT UNIQUE,"
+            + COLUMN_PASSWORD + " TEXT,"
+            + COLUMN_ROL + " TEXT" + ")";
 
     // ==========================================
     // MÉTODOS DEL CICLO DE VIDA DE LA BD
@@ -103,6 +119,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_TABLE_HISTORIAL);
         db.execSQL(CREATE_TABLE_PAGOS);
         db.execSQL(CREATE_TABLE_INVENTARIO);
+        db.execSQL(CREATE_TABLE_USUARIOS);
+
+        // Insertar el primer superusuario (Doctor) por defecto
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_USUARIO, "admin_doctor");
+        values.put(COLUMN_PASSWORD, "12345"); // Contraseña temporal
+        values.put(COLUMN_ROL, "superusuario");
+
+        db.insert(TABLE_USUARIOS, null, values);
     }
 
     @Override
@@ -112,7 +137,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_HISTORIAL);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_PAGOS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_INVENTARIO);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_USUARIOS);
         onCreate(db);
+
     }
 
     // ==========================================
@@ -177,6 +204,24 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         valores.put(COL_INV_NOMBRE, nombre);
         valores.put(COL_INV_CANTIDAD, cantidad);
         return db.insert(TABLE_INVENTARIO, null, valores);
+    }
+
+    //Validacion usuarios
+    public String validarLogin(String usuario, String password) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String rol = null;
+
+        // Consultar el usuario
+        Cursor cursor = db.rawQuery("SELECT " + COLUMN_ROL + " FROM " + TABLE_USUARIOS +
+                        " WHERE " + COLUMN_USUARIO + "=? AND " + COLUMN_PASSWORD + "=?",
+                new String[]{usuario, password});
+
+        if (cursor != null && cursor.moveToFirst()) {
+            rol = cursor.getString(0); // Obtiene el rol (ej. "superusuario")
+            cursor.close();
+        }
+
+        return rol; // Si retorna null, el usuario o contraseña son incorrectos
     }
 
 }
