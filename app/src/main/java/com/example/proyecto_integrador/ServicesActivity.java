@@ -5,19 +5,19 @@ import android.os.Bundle;
 import android.widget.Button;
 import androidx.appcompat.app.AppCompatActivity;
 
-public class MainActivity extends AppCompatActivity {
+public class ServicesActivity extends AppCompatActivity {
 
-    private Button btnVerServicios;
+    private Button btnAgendarCita;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_services);
 
-        btnVerServicios = findViewById(R.id.btnVerServicios);
+        btnAgendarCita = findViewById(R.id.btnAgendarCita);
 
-        btnVerServicios.setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this, ServicesActivity.class);
+        btnAgendarCita.setOnClickListener(v -> {
+            Intent intent = new Intent(ServicesActivity.this, AppointmentActivity.class);
             startActivity(intent);
         });
     }

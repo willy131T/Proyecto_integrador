@@ -1,9 +1,8 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.Proyecto_integrador" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+    <!-- Tema base de la aplicación -->
+    <style name="Base.Theme.ConsultorioDentalPlaza" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Puedes personalizar colores aquí -->
     </style>
 
-    <style name="Theme.Proyecto_integrador" parent="Base.Theme.Proyecto_integrador" />
+    <style name="Theme.ConsultorioDentalPlaza" parent="Base.Theme.ConsultorioDentalPlaza" />
 </resources>

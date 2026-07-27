@@ -1,0 +1,50 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:gravity="center"
+    android:background="#F4F6F9">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Agendar Cita"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:textColor="#1E293B"
+        android:layout_marginBottom="24dp" />
+
+    <EditText
+        android:id="@+id/etNombre"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Nombre completo"
+        android:inputType="textPersonName"
+        android:layout_marginBottom="16dp" />
+
+    <EditText
+        android:id="@+id/etFecha"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Fecha (DD/MM/AAAA)"
+        android:inputType="date"
+        android:layout_marginBottom="16dp" />
+
+    <EditText
+        android:id="@+id/etHora"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Hora (HH:MM)"
+        android:inputType="time"
+        android:layout_marginBottom="32dp" />
+
+    <Button
+        android:id="@+id/btnConfirmarCita"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:text="Confirmar Cita"
+        android:textSize="18sp"
+        android:backgroundTint="#0284C7" />
+
+</LinearLayout>
