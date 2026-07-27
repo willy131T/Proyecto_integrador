@@ -12,6 +12,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ConsultorioDentalPlaza">
         <activity
+            android:name=".AppointmentActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ServicesActivity"
+            android:exported="false" />
+        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
