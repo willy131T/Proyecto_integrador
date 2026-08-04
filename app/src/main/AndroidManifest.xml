@@ -12,11 +12,13 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Proyecto_integrador">
         <activity
-            android:name="com.example.proyecto_integrador.AgendarCitaActivity"
+            android:name=".HistorialActivity"
             android:exported="false" />
-        <!-- LoginActivity con la ruta completa y exacta -->
         <activity
-            android:name="com.example.proyecto_integrador.LoginActivity"
+            android:name=".AgendarCitaActivity"
+            android:exported="false" /> <!-- LoginActivity con la ruta completa y exacta -->
+        <activity
+            android:name=".LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -25,10 +27,10 @@
             </intent-filter>
         </activity> <!-- MainActivity con la ruta completa -->
         <activity
-            android:name="com.example.proyecto_integrador.MainActivity"
+            android:name=".MainActivity"
             android:exported="false" /> <!-- RegistroActivity con la ruta completa -->
         <activity
-            android:name="com.example.proyecto_integrador.RegistroActivity"
+            android:name=".RegistroActivity"
             android:exported="false" />
     </application>
 

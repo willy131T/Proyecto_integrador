@@ -35,8 +35,8 @@ public class MainActivity extends AppCompatActivity {
         btnVerHistorial.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Aquí pondremos el Intent para ir a HistorialActivity más adelante
-                Toast.makeText(MainActivity.this, "Cargando tu historial clínico...", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(MainActivity.this, HistorialActivity.class);
+                startActivity(intent);
             }
         });
 

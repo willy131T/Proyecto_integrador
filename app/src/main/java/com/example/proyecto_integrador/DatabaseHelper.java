@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     // Nombre y versión de la base de datos
@@ -304,4 +305,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // Si resultado es -1, hubo un error. Si es diferente, se guardó bien.
         return resultado != -1;
     }
+
+
+
+    // Método para consultar todas las citas
+    public Cursor obtenerCitas() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        // Hacemos un SELECT de todos los registros en la tabla CITAS
+        return db.rawQuery("SELECT * FROM CITAS", null);
+    }
+
+
 }
