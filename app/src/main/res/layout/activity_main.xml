@@ -76,6 +76,16 @@
         android:textColor="#000000"
         android:layout_marginBottom="16dp"/>
 
+    <!-- Botón exclusivo del Administrador para Registrar Doctores -->
+    <Button
+        android:id="@+id/btnRegistrarDoctor"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:text="REGISTRAR NUEVO DOCTOR"
+        android:textSize="15sp"
+        android:backgroundTint="#6c757d"
+        android:layout_marginBottom="16dp"/>
+
     <!-- Botón para Cerrar Sesión -->
     <Button
         android:id="@+id/btnCerrarSesion"

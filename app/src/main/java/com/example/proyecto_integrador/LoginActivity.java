@@ -67,23 +67,18 @@ public class LoginActivity extends AppCompatActivity {
         // Validación 2: Consultamos a la base de datos qué rol tiene este usuario
         String rol = dbHelper.validarLogin(usuario, password);
 
-        if (rol != null) {
-            // Si el rol NO es nulo, significa que el usuario y la contraseña son correctos
-            Toast.makeText(this, "Bienvenido, entrando como: " + rol, Toast.LENGTH_SHORT).show();
-
-            // Lógica de ruteo dependiendo si es el Doctor o el Paciente
-            if (rol.equals("dentista")) {
-                // Lo mandamos al panel del doctor (MainActivity por ahora)
-                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                startActivity(intent);
-                finish(); // Destruimos la pantalla de login para que no pueda volver con la flecha de "atrás"
-            } else if (rol.equals("paciente")) {
-                // Lo mandamos al panel del paciente (Usaremos MainActivity por ahora hasta crear el panel del paciente)
-                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                startActivity(intent);
-                finish();
-            }
-        } else {
+        if (rol.equals("dentista")) {
+            // Panel completo para el Administrador / Doctor
+            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+            startActivity(intent);
+            finish();
+        } else if (rol.equals("paciente")) {
+            // Panel limitado y específico para el Paciente
+            Intent intent = new Intent(LoginActivity.this, PacienteActivity.class);
+            startActivity(intent);
+            finish();
+        }
+         else {
             // Si el rol es nulo, los datos son incorrectos
             Toast.makeText(this, "Usuario o contraseña incorrectos", Toast.LENGTH_SHORT).show();
         }

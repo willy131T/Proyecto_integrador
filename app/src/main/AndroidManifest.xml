@@ -12,6 +12,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Proyecto_integrador">
         <activity
+            android:name=".PacienteActivity"
+            android:exported="false" />
+        <activity
             android:name=".InventarioActivity"
             android:exported="false" />
         <activity
