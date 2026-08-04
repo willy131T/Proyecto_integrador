@@ -29,7 +29,7 @@ public class PacienteActivity extends AppCompatActivity {
         btnAgendar = findViewById(R.id.btnAgendarCitaPaciente);
         btnCerrarSesion = findViewById(R.id.btnCerrarSesionPaciente);
 
-        // Recibimos el nombre o usuario que inició sesión
+        // Recibimos el nombre del usuario que inició sesión
         nombreUsuarioLogueado = getIntent().getStringExtra("nombre_usuario");
         if (nombreUsuarioLogueado == null) {
             nombreUsuarioLogueado = "Paciente";
@@ -38,6 +38,7 @@ public class PacienteActivity extends AppCompatActivity {
         tvBienvenida.setText("¡Hola, " + nombreUsuarioLogueado + "!");
 
         cargarDatosPaciente();
+        cargarDiagnosticosYTratamientos();
         cargarProximaCita();
 
         // Botón para agendar cita
@@ -65,38 +66,67 @@ public class PacienteActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        // Refrescamos los datos por si agendó una cita o el doctor le actualizó el tratamiento
+        // Refrescamos toda la información al volver a la pantalla
         cargarDatosPaciente();
+        cargarDiagnosticosYTratamientos();
         cargarProximaCita();
     }
 
     private void cargarDatosPaciente() {
         Cursor cursor = dbHelper.obtenerPacientes();
+        boolean encontrado = false;
         if (cursor != null) {
             while (cursor.moveToNext()) {
                 String nombre = cursor.getString(cursor.getColumnIndexOrThrow("nombre"));
-                // Verificamos si coincide el nombre (o parte de él)
                 if (nombre.equalsIgnoreCase(nombreUsuarioLogueado) || nombreUsuarioLogueado.contains(nombre)) {
                     int edad = cursor.getInt(cursor.getColumnIndexOrThrow("edad"));
                     String alergias = cursor.getString(cursor.getColumnIndexOrThrow("alergias"));
-                    String tratamiento = cursor.getString(cursor.getColumnIndexOrThrow("tratamiento"));
 
                     if (alergias == null || alergias.isEmpty()) alergias = "Ninguna";
-                    if (tratamiento == null || tratamiento.isEmpty()) tratamiento = "Sin tratamientos activos recientes.";
 
                     tvDatosInfo.setText("🎂 Edad: " + edad + " años\n⚠️ Alergias: " + alergias);
-                    tvTratamientoInfo.setText(tratamiento);
+                    encontrado = true;
                     break;
                 }
             }
             cursor.close();
+        }
+
+        if (!encontrado) {
+            tvDatosInfo.setText("🎂 Edad: No registrada\n⚠️ Alergias: Ninguna");
+        }
+    }
+
+    private void cargarDiagnosticosYTratamientos() {
+        // Consultamos la nueva tabla de diagnósticos independiente para este paciente
+        Cursor cursor = dbHelper.obtenerDiagnosticosPorPaciente(nombreUsuarioLogueado);
+        StringBuilder sb = new StringBuilder();
+
+        if (cursor != null && cursor.getCount() > 0) {
+            while (cursor.moveToNext()) {
+                String citaInfo = cursor.getString(cursor.getColumnIndexOrThrow("cita_info"));
+                String procedimiento = cursor.getString(cursor.getColumnIndexOrThrow("procedimiento"));
+                String medicamentos = cursor.getString(cursor.getColumnIndexOrThrow("medicamentos"));
+                String fecha = cursor.getString(cursor.getColumnIndexOrThrow("fecha"));
+
+                sb.append("🗓️ Fecha: ").append(fecha).append("\n");
+                sb.append("📌 ").append(citaInfo).append("\n");
+                sb.append("🦷 Procedimiento: ").append(procedimiento).append("\n");
+                if (medicamentos != null && !medicamentos.isEmpty()) {
+                    sb.append("💊 Receta: ").append(medicamentos).append("\n");
+                }
+                sb.append("----------------------------------\n");
+            }
+            cursor.close();
+            tvTratamientoInfo.setText(sb.toString().trim());
+        } else {
+            tvTratamientoInfo.setText("No tienes tratamientos o diagnósticos registrados todavía.");
         }
     }
 
     private void cargarProximaCita() {
         Cursor cursor = dbHelper.obtenerCitas();
         if (cursor != null && cursor.getCount() > 0) {
-            // Tomamos la última cita registrada como referencia para la tarjeta
             if (cursor.moveToLast()) {
                 String fecha = cursor.getString(cursor.getColumnIndexOrThrow("fecha"));
                 String hora = cursor.getString(cursor.getColumnIndexOrThrow("hora"));
