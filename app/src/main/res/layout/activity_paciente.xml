@@ -1,58 +1,128 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="32dp"
-    android:gravity="center"
-    android:background="#F8F9FA">
+    android:background="#F8F9FA"
+    android:padding="20dp">
 
-    <!-- Título -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Panel de Paciente"
-        android:textSize="28sp"
-        android:textStyle="bold"
-        android:textColor="#333333"
-        android:layout_marginBottom="8dp"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Bienvenido a Consultorio Dental Plaza"
-        android:textSize="16sp"
-        android:textColor="#666666"
-        android:layout_marginBottom="30dp"/>
-
-    <!-- Botón para Agendar Cita -->
-    <Button
-        android:id="@+id/btnAgendarCitaPaciente"
-        android:layout_width="match_parent"
-        android:layout_height="55dp"
-        android:text="AGENDAR NUEVA CITA"
-        android:textSize="15sp"
-        android:backgroundTint="#0056b3"
-        android:layout_marginBottom="16dp"/>
-
-    <!-- Botón para Ver Citas -->
-    <Button
-        android:id="@+id/btnVerCitasPaciente"
-        android:layout_width="match_parent"
-        android:layout_height="55dp"
-        android:text="MIS CITAS PROGRAMADAS"
-        android:textSize="15sp"
-        android:backgroundTint="#17a2b8"
-        android:layout_marginBottom="30dp"/>
-
-    <!-- Botón para Cerrar Sesión -->
-    <Button
-        android:id="@+id/btnCerrarSesionPaciente"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="CERRAR SESIÓN"
-        android:textColor="#dc3545"
-        android:backgroundTint="#FFFFFF"
-        style="?android:attr/borderlessButtonStyle"/>
+        android:orientation="vertical">
 
-</LinearLayout>
+        <!-- Encabezado de Bienvenida -->
+        <TextView
+            android:id="@+id/tvBienvenidaPaciente"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="¡Bienvenido, Paciente!"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="#333333"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- Tarjeta 1: Mis Datos y Alergias -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="#FFFFFF"
+            android:padding="16dp"
+            android:layout_marginBottom="14dp"
+            android:elevation="2dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="👤 Mis Datos Médicos"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#0056b3"
+                android:layout_marginBottom="8dp"/>
+
+            <TextView
+                android:id="@+id/tvDatosPacienteInfo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Edad y Alergias cargando..."
+                android:textSize="14sp"
+                android:textColor="#555555"/>
+        </LinearLayout>
+
+        <!-- Tarjeta 2: Tratamiento y Receta Activa -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="#FFFFFF"
+            android:padding="16dp"
+            android:layout_marginBottom="14dp"
+            android:elevation="2dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="🦷 Tratamiento y Receta Activa"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#28a745"
+                android:layout_marginBottom="8dp"/>
+
+            <TextView
+                android:id="@+id/tvTratamientoPacienteInfo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Sin tratamientos activos recientes."
+                android:textSize="14sp"
+                android:textColor="#555555"/>
+        </LinearLayout>
+
+        <!-- Tarjeta 3: Próxima Cita -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="#FFFFFF"
+            android:padding="16dp"
+            android:layout_marginBottom="24dp"
+            android:elevation="2dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="📅 Próxima Cita Programada"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#17a2b8"
+                android:layout_marginBottom="8dp"/>
+
+            <TextView
+                android:id="@+id/tvProximaCitaPaciente"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="No tienes citas agendadas."
+                android:textSize="14sp"
+                android:textColor="#555555"/>
+        </LinearLayout>
+
+        <!-- Botones de Acción -->
+        <Button
+            android:id="@+id/btnAgendarCitaPaciente"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:text="AGENDAR NUEVA CITA"
+            android:textSize="14sp"
+            android:backgroundTint="#0056b3"
+            android:layout_marginBottom="12dp"/>
+
+        <Button
+            android:id="@+id/btnCerrarSesionPaciente"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="CERRAR SESIÓN"
+            android:textColor="#dc3545"
+            android:backgroundTint="#FFFFFF"
+            style="?android:attr/borderlessButtonStyle"/>
+
+    </LinearLayout>
+</ScrollView>

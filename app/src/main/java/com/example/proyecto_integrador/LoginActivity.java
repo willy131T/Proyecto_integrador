@@ -22,7 +22,7 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login); // Vincula con el XML que acabamos de crear
+        setContentView(R.layout.activity_login);
 
         // Inicializamos la base de datos
         dbHelper = new DatabaseHelper(this);
@@ -45,7 +45,6 @@ public class LoginActivity extends AppCompatActivity {
         tvRegistrarse.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Intent para saltar a la pantalla de Registro (Siguiente plantilla)
                 Intent intent = new Intent(LoginActivity.this, RegistroActivity.class);
                 startActivity(intent);
             }
@@ -61,7 +60,7 @@ public class LoginActivity extends AppCompatActivity {
         // Validación 1: Que no dejen los campos vacíos
         if (usuario.isEmpty() || password.isEmpty()) {
             Toast.makeText(this, "Por favor, llena todos los campos", Toast.LENGTH_SHORT).show();
-            return; // Detiene la ejecución para no consultar la base de datos en vano
+            return;
         }
 
         // Validación 2: Consultamos a la base de datos qué rol tiene este usuario
@@ -75,10 +74,10 @@ public class LoginActivity extends AppCompatActivity {
         } else if (rol.equals("paciente")) {
             // Panel limitado y específico para el Paciente
             Intent intent = new Intent(LoginActivity.this, PacienteActivity.class);
+            intent.putExtra("nombre_usuario", usuario);
             startActivity(intent);
             finish();
-        }
-         else {
+        } else {
             // Si el rol es nulo, los datos son incorrectos
             Toast.makeText(this, "Usuario o contraseña incorrectos", Toast.LENGTH_SHORT).show();
         }
