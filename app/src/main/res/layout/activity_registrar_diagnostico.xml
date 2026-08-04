@@ -13,83 +13,71 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Agendar Nueva Cita"
-            android:textSize="24sp"
+            android:text="Registrar Diagnóstico Clínico"
+            android:textSize="22sp"
             android:textStyle="bold"
             android:textColor="#333333"
             android:textAlignment="center"
             android:layout_marginBottom="24dp"/>
 
-        <!-- Selector de Fecha Automático -->
+        <!-- Selector de la Cita Correspondiente -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Fecha de la cita:"
-            android:textColor="#666666"
-            android:layout_marginBottom="4dp"/>
-
-        <EditText
-            android:id="@+id/etFechaCita"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:hint="Selecciona la fecha"
-            android:focusable="false"
-            android:clickable="true"
-            android:focusableInTouchMode="false"
-            android:background="#FFFFFF"
-            android:padding="12dp"
-            android:layout_marginBottom="16dp"/>
-
-        <!-- Hora -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Hora (ej. 10:00 AM):"
-            android:textColor="#666666"
-            android:layout_marginBottom="4dp"/>
-
-        <EditText
-            android:id="@+id/etHoraCita"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:hint="Ej. 10:00 AM"
-            android:background="#FFFFFF"
-            android:padding="12dp"
-            android:layout_marginBottom="16dp"/>
-
-        <!-- Motivo de la consulta (Spinner) -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Motivo de la consulta:"
+            android:text="Vincular a Cita:"
             android:textColor="#666666"
             android:layout_marginBottom="4dp"/>
 
         <Spinner
-            android:id="@+id/spinnerMotivo"
+            android:id="@+id/spinnerCitasPaciente"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:background="#FFFFFF"
             android:padding="8dp"
-            android:layout_marginBottom="12dp"/>
+            android:layout_marginBottom="16dp"/>
 
-        <!-- Campo adicional si selecciona "Otro" -->
-        <EditText
-            android:id="@+id/etMotivoOtro"
+        <!-- Procedimiento realizado -->
+        <TextView
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:hint="Escribe el motivo..."
-            android:visibility="gone"
+            android:layout_height="wrap_content"
+            android:text="Procedimiento Realizado:"
+            android:textColor="#666666"
+            android:layout_marginBottom="4dp"/>
+
+        <EditText
+            android:id="@+id/etProcedimientoClinico"
+            android:layout_width="match_parent"
+            android:layout_height="90dp"
+            android:hint="Ej. Resina en molar superior, profilaxis..."
             android:background="#FFFFFF"
             android:padding="12dp"
+            android:gravity="top"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- Medicamentos recetados -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Medicamentos Recetados:"
+            android:textColor="#666666"
+            android:layout_marginBottom="4dp"/>
+
+        <EditText
+            android:id="@+id/etMedicamentosClinico"
+            android:layout_width="match_parent"
+            android:layout_height="90dp"
+            android:hint="Ej. Amoxicilina 500mg - Cada 8 hrs por 5 días"
+            android:background="#FFFFFF"
+            android:padding="12dp"
+            android:gravity="top"
             android:layout_marginBottom="24dp"/>
 
         <Button
-            android:id="@+id/btnConfirmarCita"
+            android:id="@+id/btnGuardarDiagnosticoFinal"
             android:layout_width="match_parent"
             android:layout_height="55dp"
-            android:text="CONFIRMAR CITA"
-            android:textSize="16sp"
+            android:text="GUARDAR DIAGNÓSTICO Y TRATAMIENTO"
+            android:textSize="15sp"
             android:backgroundTint="#28a745"/>
 
     </LinearLayout>

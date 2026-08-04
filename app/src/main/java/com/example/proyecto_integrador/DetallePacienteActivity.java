@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
@@ -47,11 +48,14 @@ public class DetallePacienteActivity extends AppCompatActivity {
             }
         });
 
-        // 2. Botón: Registrar nuevo diagnóstico / tratamiento en tiempo real
+        // 2. Botón: Registrar diagnóstico y tratamiento con procedimiento y medicamentos
+        // Botón: Abrir pantalla completa para registrar diagnóstico y tratamiento
         btnNuevoDiagnostico.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mostrarDialogoDiagnostico();
+                Intent intent = new Intent(DetallePacienteActivity.this, RegistrarDiagnosticoActivity.class);
+                intent.putExtra("nombre_paciente", nombrePaciente);
+                startActivity(intent);
             }
         });
 
@@ -66,35 +70,47 @@ public class DetallePacienteActivity extends AppCompatActivity {
         });
     }
 
-    // Ventana emergente para actualizar el tratamiento o diagnóstico del paciente actual
     private void mostrarDialogoDiagnostico() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Nuevo Diagnóstico / Tratamiento");
+        builder.setTitle("Registrar Diagnóstico y Tratamiento");
 
-        final EditText inputTratamiento = new EditText(this);
-        inputTratamiento.setHint("Ej. Resina en molar, Profilaxis, etc.");
-        inputTratamiento.setPadding(40, 30, 40, 30);
-        builder.setView(inputTratamiento);
+        LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        layout.setPadding(40, 20, 40, 20);
+
+        final EditText inputProcedimiento = new EditText(this);
+        inputProcedimiento.setHint("Procedimiento realizado (Ej. Resina, Limpieza)");
+        inputProcedimiento.setPadding(0, 10, 0, 20);
+        layout.addView(inputProcedimiento);
+
+        final EditText inputMedicamentos = new EditText(this);
+        inputMedicamentos.setHint("Medicamentos recetados (Ej. Amoxicilina 500mg)");
+        inputMedicamentos.setPadding(0, 10, 0, 10);
+        layout.addView(inputMedicamentos);
+
+        builder.setView(layout);
 
         builder.setPositiveButton("Guardar", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                String nuevoTratamiento = inputTratamiento.getText().toString().trim();
+                String procedimiento = inputProcedimiento.getText().toString().trim();
+                String medicamentos = inputMedicamentos.getText().toString().trim();
 
-                if (nuevoTratamiento.isEmpty()) {
-                    Toast.makeText(DetallePacienteActivity.this, "El campo no puede estar vacío", Toast.LENGTH_SHORT).show();
+                if (procedimiento.isEmpty()) {
+                    Toast.makeText(DetallePacienteActivity.this, "El procedimiento es obligatorio", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                boolean actualizado = dbHelper.actualizarTratamientoPaciente(nombrePaciente, nuevoTratamiento);
+                String tratamientoCompleto = procedimiento + (medicamentos.isEmpty() ? "" : " | Receta: " + medicamentos);
+
+                boolean actualizado = dbHelper.actualizarTratamientoPaciente(nombrePaciente, tratamientoCompleto);
 
                 if (actualizado) {
-                    Toast.makeText(DetallePacienteActivity.this, "¡Tratamiento actualizado con éxito!", Toast.LENGTH_LONG).show();
-                    // Refrescamos el texto en pantalla
-                    tvInfo.setText(infoPaciente.replaceAll("🦷 Tratamiento: .*", "🦷 Tratamiento: " + nuevoTratamiento));
+                    Toast.makeText(DetallePacienteActivity.this, "¡Diagnóstico guardado con éxito!", Toast.LENGTH_LONG).show();
+                    tvInfo.setText(infoPaciente.replaceAll("🦷 Tratamiento: .*", "🦷 Tratamiento: " + tratamientoCompleto));
                     infoPaciente = tvInfo.getText().toString();
                 } else {
-                    Toast.makeText(DetallePacienteActivity.this, "Error al actualizar el tratamiento", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(DetallePacienteActivity.this, "Error al guardar el diagnóstico", Toast.LENGTH_SHORT).show();
                 }
             }
         });

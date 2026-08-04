@@ -15,7 +15,7 @@ import java.util.Calendar;
 
 public class AgendarCitaActivity extends AppCompatActivity {
 
-    private EditText etFecha, etHora, etMotivoOtro, etProcedimiento, etMedicamentos;
+    private EditText etFecha, etHora, etMotivoOtro;
     private Spinner spinnerMotivo;
     private Button btnConfirmar;
     private DatabaseHelper dbHelper;
@@ -31,11 +31,9 @@ public class AgendarCitaActivity extends AppCompatActivity {
         etHora = findViewById(R.id.etHoraCita);
         spinnerMotivo = findViewById(R.id.spinnerMotivo);
         etMotivoOtro = findViewById(R.id.etMotivoOtro);
-        etProcedimiento = findViewById(R.id.etProcedimiento);
-        etMedicamentos = findViewById(R.id.etMedicamentos);
         btnConfirmar = findViewById(R.id.btnConfirmarCita);
 
-        // 1. Configurar selector de fecha automático (DatePicker)
+        // 1. Selector de fecha automático
         etFecha.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -48,7 +46,6 @@ public class AgendarCitaActivity extends AppCompatActivity {
                         new DatePickerDialog.OnDateSetListener() {
                             @Override
                             public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                                // Formato limpio DD/MM/AAAA
                                 String fechaFormateada = String.format("%02d/%02d/%d", dayOfMonth, (month + 1), year);
                                 etFecha.setText(fechaFormateada);
                             }
@@ -57,7 +54,7 @@ public class AgendarCitaActivity extends AppCompatActivity {
             }
         });
 
-        // 2. Configurar Spinner con motivos por defecto de consultorio dental
+        // 2. Spinner de motivos
         final String[] motivos = {
                 "Limpieza dental (Profilaxis)",
                 "Ortodoncia (Ajuste / Revision)",
@@ -97,7 +94,6 @@ public class AgendarCitaActivity extends AppCompatActivity {
     private void guardarCita() {
         String fecha = etFecha.getText().toString().trim();
         String hora = etHora.getText().toString().trim();
-
         String motivoSeleccionado = spinnerMotivo.getSelectedItem().toString();
         String motivoFinal = motivoSeleccionado.equals("Otro...") ? etMotivoOtro.getText().toString().trim() : motivoSeleccionado;
 
