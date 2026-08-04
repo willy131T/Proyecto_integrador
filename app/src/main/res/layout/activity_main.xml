@@ -1,19 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    android:orientation="vertical"
+    android:padding="32dp"
+    android:gravity="center"
+    android:background="#F8F9FA">
+
+    <!-- Ícono o Título Principal -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Bienvenido"
+        android:textSize="28sp"
+        android:textStyle="bold"
+        android:textColor="#333333"
+        android:layout_marginBottom="8dp"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:text="Panel de Control"
+        android:textSize="16sp"
+        android:textColor="#666666"
+        android:layout_marginBottom="40dp"/>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <!-- Botón para Agendar Cita -->
+    <Button
+        android:id="@+id/btnAgendarCita"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:text="AGENDAR NUEVA CITA"
+        android:textSize="16sp"
+        android:backgroundTint="#0056b3"
+        android:layout_marginBottom="20dp"/>
+
+    <!-- Botón para Ver Historial -->
+    <Button
+        android:id="@+id/btnVerHistorial"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:text="MIS CITAS E HISTORIAL"
+        android:textSize="16sp"
+        android:backgroundTint="#17a2b8"
+        android:layout_marginBottom="40dp"/>
+
+    <!-- Botón para Cerrar Sesión -->
+    <Button
+        android:id="@+id/btnCerrarSesion"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="CERRAR SESIÓN"
+        android:textColor="#dc3545"
+        android:backgroundTint="#FFFFFF"
+        style="?android:attr/borderlessButtonStyle"/>
+
+</LinearLayout>
