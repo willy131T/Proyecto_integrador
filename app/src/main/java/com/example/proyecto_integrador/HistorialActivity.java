@@ -43,10 +43,7 @@ public class HistorialActivity extends AppCompatActivity {
     }
 
     private void cargarCitas() {
-        // Limpiamos las listas por si recargamos los datos
         listaCitas.clear();
-        listaIds.clear();
-
         Cursor cursor = dbHelper.obtenerCitas();
 
         if (cursor.getCount() == 0) {
@@ -55,21 +52,19 @@ public class HistorialActivity extends AppCompatActivity {
         }
 
         while (cursor.moveToNext()) {
-            // Asumimos que la columna 0 es el ID_CITA
-            int idCita = cursor.getInt(0);
-            String fecha = cursor.getString(1);
-            String hora = cursor.getString(2);
-            String motivo = cursor.getString(3);
+            String fecha = cursor.getString(cursor.getColumnIndexOrThrow("fecha"));
+            String hora = cursor.getString(cursor.getColumnIndexOrThrow("hora"));
+            String motivo = cursor.getString(cursor.getColumnIndexOrThrow("motivo"));
 
-            // Guardamos el ID en nuestra lista paralela
-            listaIds.add(idCita);
-
-            String citaFormateada = "📅 Fecha: " + fecha + "\n⏰ Hora: " + hora + "\n🩺 Motivo: " + motivo;
+            String citaFormateada = "📅 Fecha: " + fecha +
+                    "\n⏰ Hora: " + hora +
+                    "\n🩺 Motivo: " + motivo;
             listaCitas.add(citaFormateada);
         }
 
         adaptador = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, listaCitas);
         lvCitas.setAdapter(adaptador);
+        cursor.close();
     }
 
     // Método para mostrar la alerta de confirmación

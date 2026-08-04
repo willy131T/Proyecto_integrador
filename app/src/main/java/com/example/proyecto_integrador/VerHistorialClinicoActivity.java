@@ -28,6 +28,7 @@ public class VerHistorialClinicoActivity extends AppCompatActivity {
     }
 
     private void cargarPacientes() {
+        listaPacientes.clear();
         Cursor cursor = dbHelper.obtenerPacientes();
 
         if (cursor.getCount() == 0) {
@@ -36,11 +37,15 @@ public class VerHistorialClinicoActivity extends AppCompatActivity {
         }
 
         while (cursor.moveToNext()) {
-            // Asumiendo el orden de columnas: 0:ID, 1:NOMBRE, 2:EDAD, 3:ALERGIAS, 4:TRATAMIENTO
-            String nombre = cursor.getString(1);
-            int edad = cursor.getInt(2);
-            String alergias = cursor.getString(3);
-            String tratamiento = cursor.getString(4);
+            // Usamos nombres de columnas exactos para evitar cruce de datos
+            String nombre = cursor.getString(cursor.getColumnIndexOrThrow("nombre"));
+            int edad = cursor.getInt(cursor.getColumnIndexOrThrow("edad"));
+            String alergias = cursor.getString(cursor.getColumnIndexOrThrow("alergias"));
+            String tratamiento = cursor.getString(cursor.getColumnIndexOrThrow("tratamiento"));
+
+            // Manejo por si vienen vacíos o nulos
+            if (alergias == null || alergias.isEmpty()) alergias = "Ninguna";
+            if (tratamiento == null || tratamiento.isEmpty()) tratamiento = "Pendiente";
 
             String pacienteFormateado = "👤 Nombre: " + nombre +
                     "\n🎂 Edad: " + edad + " años" +
@@ -51,5 +56,6 @@ public class VerHistorialClinicoActivity extends AppCompatActivity {
 
         adaptador = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, listaPacientes);
         lvPacientes.setAdapter(adaptador);
+        cursor.close();
     }
 }
