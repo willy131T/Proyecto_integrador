@@ -246,10 +246,30 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         return db.rawQuery("SELECT * FROM " + TABLE_INVENTARIO, null);
     }
-
+    // ==========================================
+    // funciones extra
+    // ==========================================
     public Cursor obtenerUsuarioPorUsername(String usuario) {
         SQLiteDatabase db = this.getReadableDatabase();
         return db.rawQuery("SELECT * FROM " + TABLE_USUARIOS + " WHERE usuario = ?", new String[]{usuario});
+    }
+
+    public Cursor obtenerDiagnosticosParaPaciente(String usuarioOIdentificador) {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        // 1. Buscamos si el texto ingresado coincide con un usuario para obtener su nombre real
+        String nombreReal = usuarioOIdentificador;
+        Cursor cursorUser = db.rawQuery("SELECT nombre FROM Usuarios WHERE usuario = ?", new String[]{usuarioOIdentificador});
+        if (cursorUser != null && cursorUser.moveToFirst()) {
+            nombreReal = cursorUser.getString(0);
+            cursorUser.close();
+        } else if (cursorUser != null) {
+            cursorUser.close();
+        }
+
+        // 2. Consultamos los diagnósticos buscando tanto por el nombre real como por el identificador original
+        return db.rawQuery("SELECT * FROM " + TABLE_DIAGNOSTICOS + " WHERE nombre_paciente = ? OR nombre_paciente = ?",
+                new String[]{nombreReal, usuarioOIdentificador});
     }
 
 }

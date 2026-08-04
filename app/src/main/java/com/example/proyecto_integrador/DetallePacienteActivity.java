@@ -3,6 +3,7 @@ package com.example.proyecto_integrador;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -48,8 +49,7 @@ public class DetallePacienteActivity extends AppCompatActivity {
             }
         });
 
-        // 2. Botón: Registrar diagnóstico y tratamiento con procedimiento y medicamentos
-        // Botón: Abrir pantalla completa para registrar diagnóstico y tratamiento
+        // 2. Botón: Abrir pantalla completa para registrar diagnóstico y tratamiento
         btnNuevoDiagnostico.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -70,58 +70,37 @@ public class DetallePacienteActivity extends AppCompatActivity {
         });
     }
 
-    private void mostrarDialogoDiagnostico() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Registrar Diagnóstico y Tratamiento");
+    // ⬇️ AQUÍ ESTÁ EL ONRESUME UBICADO CORRECTAMENTE ABAJO DE ONCREATE
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Recarga automáticamente los datos y el tratamiento actualizado al volver de registrar el diagnóstico
+        cargarDatosPacienteEnDetalle();
+    }
 
-        LinearLayout layout = new LinearLayout(this);
-        layout.setOrientation(LinearLayout.VERTICAL);
-        layout.setPadding(40, 20, 40, 20);
+    private void cargarDatosPacienteEnDetalle() {
+        Cursor cursor = dbHelper.obtenerPacientes();
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                String nombre = cursor.getString(cursor.getColumnIndexOrThrow("nombre"));
+                if (nombre.equalsIgnoreCase(nombrePaciente)) {
+                    int edad = cursor.getInt(cursor.getColumnIndexOrThrow("edad"));
+                    String alergias = cursor.getString(cursor.getColumnIndexOrThrow("alergias"));
+                    String tratamiento = cursor.getString(cursor.getColumnIndexOrThrow("tratamiento"));
 
-        final EditText inputProcedimiento = new EditText(this);
-        inputProcedimiento.setHint("Procedimiento realizado (Ej. Resina, Limpieza)");
-        inputProcedimiento.setPadding(0, 10, 0, 20);
-        layout.addView(inputProcedimiento);
+                    if (alergias == null || alergias.isEmpty()) alergias = "Ninguna";
+                    if (tratamiento == null || tratamiento.isEmpty()) tratamiento = "Sin tratamiento registrado";
 
-        final EditText inputMedicamentos = new EditText(this);
-        inputMedicamentos.setHint("Medicamentos recetados (Ej. Amoxicilina 500mg)");
-        inputMedicamentos.setPadding(0, 10, 0, 10);
-        layout.addView(inputMedicamentos);
+                    // Reconstruimos el texto informativo con los datos más frescos de la BD
+                    infoPaciente = "🎂 Edad: " + edad + " años\n" +
+                            "⚠️ Alergias: " + alergias + "\n" +
+                            "🦷 Tratamiento: " + tratamiento;
 
-        builder.setView(layout);
-
-        builder.setPositiveButton("Guardar", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                String procedimiento = inputProcedimiento.getText().toString().trim();
-                String medicamentos = inputMedicamentos.getText().toString().trim();
-
-                if (procedimiento.isEmpty()) {
-                    Toast.makeText(DetallePacienteActivity.this, "El procedimiento es obligatorio", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                String tratamientoCompleto = procedimiento + (medicamentos.isEmpty() ? "" : " | Receta: " + medicamentos);
-
-                boolean actualizado = dbHelper.actualizarTratamientoPaciente(nombrePaciente, tratamientoCompleto);
-
-                if (actualizado) {
-                    Toast.makeText(DetallePacienteActivity.this, "¡Diagnóstico guardado con éxito!", Toast.LENGTH_LONG).show();
-                    tvInfo.setText(infoPaciente.replaceAll("🦷 Tratamiento: .*", "🦷 Tratamiento: " + tratamientoCompleto));
-                    infoPaciente = tvInfo.getText().toString();
-                } else {
-                    Toast.makeText(DetallePacienteActivity.this, "Error al guardar el diagnóstico", Toast.LENGTH_SHORT).show();
+                    tvInfo.setText(infoPaciente);
+                    break;
                 }
             }
-        });
-
-        builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
-            }
-        });
-
-        builder.show();
+            cursor.close();
+        }
     }
 }

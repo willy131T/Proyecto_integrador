@@ -41,6 +41,7 @@ public class PacienteActivity extends AppCompatActivity {
         cargarDiagnosticosYTratamientos();
         cargarProximaCita();
 
+
         // Botón para agendar cita
         btnAgendar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -106,25 +107,8 @@ public class PacienteActivity extends AppCompatActivity {
     }
 
     private void cargarDiagnosticosYTratamientos() {
-        // Obtenemos todos los diagnósticos de la base de datos sin filtrar estrictamente por una sola cadena
-        Cursor cursor = dbHelper.obtenerDiagnosticosPorPaciente(nombreUsuarioLogueado);
-
-        // Si no encontró nada con el usuario corto, intentamos buscar con el nombre real del usuario obtenido de su registro
-        if (cursor == null || cursor.getCount() == 0) {
-            if (cursor != null) cursor.close();
-            // Consultamos su nombre real en la tabla de usuarios
-            Cursor cursorUser = dbHelper.obtenerUsuarioPorUsername(nombreUsuarioLogueado);
-            if (cursorUser != null && cursorUser.moveToFirst()) {
-                String nombreReal = cursorUser.getString(cursorUser.getColumnIndexOrThrow("nombre"));
-                cursorUser.close();
-                if (nombreReal != null && !nombreReal.isEmpty()) {
-                    cursor = dbHelper.obtenerDiagnosticosPorPaciente(nombreReal);
-                }
-            } else {
-                if (cursorUser != null) cursorUser.close();
-            }
-        }
-
+        // Usamos el nuevo método seguro de la base de datos
+        Cursor cursor = dbHelper.obtenerDiagnosticosParaPaciente(nombreUsuarioLogueado);
         StringBuilder sb = new StringBuilder();
 
         if (cursor != null && cursor.getCount() > 0) {
