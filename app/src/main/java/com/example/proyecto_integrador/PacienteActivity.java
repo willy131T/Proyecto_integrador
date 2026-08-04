@@ -73,21 +73,29 @@ public class PacienteActivity extends AppCompatActivity {
     }
 
     private void cargarDatosPaciente() {
-        Cursor cursor = dbHelper.obtenerPacientes();
+        // Consultamos directo en la tabla de usuarios usando el username con el que inició sesión
+        Cursor cursor = dbHelper.obtenerUsuarioPorUsername(nombreUsuarioLogueado);
         boolean encontrado = false;
-        if (cursor != null) {
-            while (cursor.moveToNext()) {
-                String nombre = cursor.getString(cursor.getColumnIndexOrThrow("nombre"));
-                if (nombre.equalsIgnoreCase(nombreUsuarioLogueado) || nombreUsuarioLogueado.contains(nombre)) {
-                    int edad = cursor.getInt(cursor.getColumnIndexOrThrow("edad"));
-                    String alergias = cursor.getString(cursor.getColumnIndexOrThrow("alergias"));
 
-                    if (alergias == null || alergias.isEmpty()) alergias = "Ninguna";
+        if (cursor != null && cursor.moveToFirst()) {
+            // Verificamos si la tabla tiene columnas de edad y alergias
+            try {
+                int edad = cursor.getInt(cursor.getColumnIndexOrThrow("edad"));
+                String alergias = cursor.getString(cursor.getColumnIndexOrThrow("alergias"));
+                String nombreReal = cursor.getString(cursor.getColumnIndexOrThrow("nombre"));
 
-                    tvDatosInfo.setText("🎂 Edad: " + edad + " años\n⚠️ Alergias: " + alergias);
-                    encontrado = true;
-                    break;
+                if (alergias == null || alergias.isEmpty()) alergias = "Ninguna";
+
+                // Si quieres actualizar el saludo con su nombre real de registro:
+                if (nombreReal != null && !nombreReal.isEmpty()) {
+                    tvBienvenida.setText("¡Hola, " + nombreReal + "!");
                 }
+
+                tvDatosInfo.setText("🎂 Edad: " + edad + " años\n⚠️ Alergias: " + alergias);
+                encontrado = true;
+            } catch (Exception e) {
+                // Por si acaso la columna de edad viene vacía o nula
+                tvDatosInfo.setText("🎂 Edad: No registrada\n⚠️ Alergias: Ninguna");
             }
             cursor.close();
         }

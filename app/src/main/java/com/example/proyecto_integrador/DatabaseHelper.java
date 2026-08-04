@@ -246,4 +246,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         return db.rawQuery("SELECT * FROM " + TABLE_INVENTARIO, null);
     }
+
+    public Cursor obtenerUsuarioPorUsername(String usuario) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery("SELECT * FROM " + TABLE_USUARIOS + " WHERE usuario = ?", new String[]{usuario});
+    }
+
 }
