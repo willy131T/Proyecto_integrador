@@ -8,8 +8,9 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
+    // Nombre y versión de la base de datos
     private static final String DATABASE_NAME = "ConsultorioDental.db";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 3; // Subimos versión para forzar la recreación con datos de prueba
 
     // ==========================================
     // 1. TABLA: PACIENTES (Req. 6)
@@ -18,7 +19,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COL_PACIENTE_ID = "id_paciente";
     public static final String COL_PACIENTE_NOMBRE = "nombre";
     public static final String COL_PACIENTE_TELEFONO = "telefono";
-    public static final String COL_PACIENTE_CORREO = "correo"; // Útil para el Req. 5 (Recordatorios)
+    public static final String COL_PACIENTE_CORREO = "correo";
 
     private static final String CREATE_TABLE_PACIENTES = "CREATE TABLE " + TABLE_PACIENTES + " (" +
             COL_PACIENTE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -34,7 +35,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COL_CITA_ID_PACIENTE = "id_paciente";
     public static final String COL_CITA_FECHA = "fecha";
     public static final String COL_CITA_HORA = "hora";
-    public static final String COL_CITA_ESTADO = "estado"; // "Pendiente", "Atendida", "Cancelada"
+    public static final String COL_CITA_ESTADO = "estado";
 
     private static final String CREATE_TABLE_CITAS = "CREATE TABLE " + TABLE_CITAS + " (" +
             COL_CITA_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -87,22 +88,25 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             COL_INV_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
             COL_INV_NOMBRE + " TEXT NOT NULL, " +
             COL_INV_CANTIDAD + " INTEGER NOT NULL);";
-    //
+
     // ==========================================
-    // 5. Tabla Usuarios
+    // 6. TABLA: USUARIOS (Adaptada para Login/Registro)
     // ==========================================
     public static final String TABLE_USUARIOS = "Usuarios";
     public static final String COLUMN_ID_USUARIO = "id_usuario";
+    public static final String COLUMN_NOMBRE = "nombre";
     public static final String COLUMN_USUARIO = "usuario";
-    public static final String COLUMN_PASSWORD = "password"; // En un entorno real debería ir encriptada
+    public static final String COLUMN_PASSWORD = "password";
     public static final String COLUMN_ROL = "rol";
+    public static final String COLUMN_ALERGIAS = "alergias";
 
-
-    String CREATE_TABLE_USUARIOS = "CREATE TABLE " + TABLE_USUARIOS + "("
+    private static final String CREATE_TABLE_USUARIOS = "CREATE TABLE " + TABLE_USUARIOS + "("
             + COLUMN_ID_USUARIO + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+            + COLUMN_NOMBRE + " TEXT,"
             + COLUMN_USUARIO + " TEXT UNIQUE,"
             + COLUMN_PASSWORD + " TEXT,"
-            + COLUMN_ROL + " TEXT" + ")";
+            + COLUMN_ROL + " TEXT,"
+            + COLUMN_ALERGIAS + " TEXT" + ")";
 
     // ==========================================
     // MÉTODOS DEL CICLO DE VIDA DE LA BD
@@ -113,7 +117,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        // Creamos todas las tablas estructuradas
+        // 1. Creamos todas las tablas
         db.execSQL(CREATE_TABLE_PACIENTES);
         db.execSQL(CREATE_TABLE_CITAS);
         db.execSQL(CREATE_TABLE_HISTORIAL);
@@ -121,13 +125,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_TABLE_INVENTARIO);
         db.execSQL(CREATE_TABLE_USUARIOS);
 
-        // Insertar el primer superusuario (Doctor) por defecto
-        ContentValues values = new ContentValues();
-        values.put(COLUMN_USUARIO, "admin_doctor");
-        values.put(COLUMN_PASSWORD, "12345"); // Contraseña temporal
-        values.put(COLUMN_ROL, "superusuario");
-
-        db.insert(TABLE_USUARIOS, null, values);
+        // 2. Insertamos Datos de Prueba (Seed Data)
+        insertarDatosDePrueba(db);
     }
 
     @Override
@@ -139,14 +138,100 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_INVENTARIO);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_USUARIOS);
         onCreate(db);
-
     }
 
     // ==========================================
-    // MÉTODOS CRUD (OPERACIONES FUNCIONALES)
+    // MÉTODO PRIVADO PARA DATOS POR DEFECTO
+    // ==========================================
+    private void insertarDatosDePrueba(SQLiteDatabase db) {
+        // --- USUARIOS POR DEFECTO ---
+        // Dentista (Admin)
+        ContentValues valuesUser = new ContentValues();
+        valuesUser.put(COLUMN_NOMBRE, "Doctor Admin");
+        valuesUser.put(COLUMN_USUARIO, "admin_doctor");
+        valuesUser.put(COLUMN_PASSWORD, "12345");
+        valuesUser.put(COLUMN_ROL, "dentista");
+        valuesUser.put(COLUMN_ALERGIAS, "Ninguna");
+        db.insert(TABLE_USUARIOS, null, valuesUser);
+
+        // Paciente de prueba
+        valuesUser.clear();
+        valuesUser.put(COLUMN_NOMBRE, "William Eduardo Antonio Marcelo");
+        valuesUser.put(COLUMN_USUARIO, "william_p");
+        valuesUser.put(COLUMN_PASSWORD, "12345");
+        valuesUser.put(COLUMN_ROL, "paciente");
+        valuesUser.put(COLUMN_ALERGIAS, "Ninguna");
+        db.insert(TABLE_USUARIOS, null, valuesUser);
+
+        // --- PACIENTES EN LA TABLA CLINICA ---
+        String insertPacientes = "INSERT INTO " + TABLE_PACIENTES + " (nombre, telefono, correo) VALUES " +
+                "('William Eduardo Antonio Marcelo', '5551234567', 'william@test.com'), " +
+                "('Andrés', '5559876543', 'andres@test.com'), " +
+                "('Sofi', '5554567890', 'sofi@test.com'), " +
+                "('Noah', '5551112233', 'noah@test.com'), " +
+                "('Vale', '5554445566', 'vale@test.com');";
+        db.execSQL(insertPacientes);
+
+        // --- INVENTARIO Y MEDICAMENTOS ---
+        String insertInventario = "INSERT INTO " + TABLE_INVENTARIO + " (nombre_material, cantidad) VALUES " +
+                "('Anestesia Local (Cárpules)', 50), " +
+                "('Resina Compuesta (Jeringas)', 30), " +
+                "('Amalgama (Cápsulas)', 20), " +
+                "('Guantes de Látex (Cajas)', 15), " +
+                "('Ibuprofeno 400mg (Cajas)', 20), " +
+                "('Amoxicilina 500mg (Cajas)', 15), " +
+                "('Agujas Dentales', 100), " +
+                "('Gasas Estériles (Paquetes)', 40);";
+        db.execSQL(insertInventario);
+    }
+
+    // ==========================================
+    // MÉTODOS DE AUTENTICACIÓN Y REGISTRO (USUARIOS)
     // ==========================================
 
-    // Req. 6: Registrar paciente
+    public boolean insertarUsuario(String nombre, String usuario, String password, String rol, String alergias) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_NOMBRE, nombre);
+        values.put(COLUMN_USUARIO, usuario);
+        values.put(COLUMN_PASSWORD, password);
+        values.put(COLUMN_ROL, rol);
+        values.put(COLUMN_ALERGIAS, alergias);
+
+        long result = db.insert(TABLE_USUARIOS, null, values);
+        return result != -1;
+    }
+
+    public boolean existeUsuario(String usuario) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(TABLE_USUARIOS, new String[]{COLUMN_ID_USUARIO},
+                COLUMN_USUARIO + "=?", new String[]{usuario},
+                null, null, null);
+        boolean exists = (cursor.getCount() > 0);
+        cursor.close();
+        return exists;
+    }
+
+    public String validarLogin(String usuario, String password) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String rol = null;
+
+        Cursor cursor = db.rawQuery("SELECT " + COLUMN_ROL + " FROM " + TABLE_USUARIOS +
+                        " WHERE " + COLUMN_USUARIO + "=? AND " + COLUMN_PASSWORD + "=?",
+                new String[]{usuario, password});
+
+        if (cursor != null && cursor.moveToFirst()) {
+            rol = cursor.getString(0);
+            cursor.close();
+        }
+
+        return rol;
+    }
+
+    // ==========================================
+    // MÉTODOS CRUD (OPERACIONES FUNCIONALES DE LA CLÍNICA)
+    // ==========================================
+
     public long insertarPaciente(String nombre, String telefono, String correo) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues valores = new ContentValues();
@@ -156,27 +241,24 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return db.insert(TABLE_PACIENTES, null, valores);
     }
 
-    // Req. 1 y 4: Agendar Cita
     public long agendarCita(int idPaciente, String fecha, String hora) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues valores = new ContentValues();
         valores.put(COL_CITA_ID_PACIENTE, idPaciente);
         valores.put(COL_CITA_FECHA, fecha);
         valores.put(COL_CITA_HORA, hora);
-        valores.put(COL_CITA_ESTADO, "Pendiente"); // Estado por defecto
+        valores.put(COL_CITA_ESTADO, "Pendiente");
         return db.insert(TABLE_CITAS, null, valores);
     }
 
-    // Req. 1: Modificar / Cancelar Cita (Actualizando el estado)
     public boolean actualizarEstadoCita(int idCita, String nuevoEstado) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues valores = new ContentValues();
-        valores.put(COL_CITA_ESTADO, nuevoEstado); // "Cancelada" o "Atendida"
+        valores.put(COL_CITA_ESTADO, nuevoEstado);
         int filasAfectadas = db.update(TABLE_CITAS, valores, COL_CITA_ID + " = ?", new String[]{String.valueOf(idCita)});
         return filasAfectadas > 0;
     }
 
-    // Req. 3 y 7: Registrar Diagnóstico, Tratamiento y Odontograma
     public long registrarHistorial(int idPaciente, String diagnostico, String tratamiento, String datosOdontograma) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues valores = new ContentValues();
@@ -187,7 +269,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return db.insert(TABLE_HISTORIAL, null, valores);
     }
 
-    // Req. 8: Registrar un pago para generar comprobante
     public long registrarPago(int idCita, double monto, String fecha) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues valores = new ContentValues();
@@ -197,7 +278,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return db.insert(TABLE_PAGOS, null, valores);
     }
 
-    // Req. 10: Registrar materiales
     public long insertarMaterial(String nombre, int cantidad) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues valores = new ContentValues();
@@ -205,23 +285,4 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         valores.put(COL_INV_CANTIDAD, cantidad);
         return db.insert(TABLE_INVENTARIO, null, valores);
     }
-
-    //Validacion usuarios
-    public String validarLogin(String usuario, String password) {
-        SQLiteDatabase db = this.getReadableDatabase();
-        String rol = null;
-
-        // Consultar el usuario
-        Cursor cursor = db.rawQuery("SELECT " + COLUMN_ROL + " FROM " + TABLE_USUARIOS +
-                        " WHERE " + COLUMN_USUARIO + "=? AND " + COLUMN_PASSWORD + "=?",
-                new String[]{usuario, password});
-
-        if (cursor != null && cursor.moveToFirst()) {
-            rol = cursor.getString(0); // Obtiene el rol (ej. "superusuario")
-            cursor.close();
-        }
-
-        return rol; // Si retorna null, el usuario o contraseña son incorrectos
-    }
-
 }
