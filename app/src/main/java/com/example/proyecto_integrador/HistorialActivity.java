@@ -1,7 +1,11 @@
 package com.example.proyecto_integrador;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -13,6 +17,7 @@ public class HistorialActivity extends AppCompatActivity {
     private ListView lvCitas;
     private DatabaseHelper dbHelper;
     private ArrayList<String> listaCitas;
+    private ArrayList<Integer> listaIds; // Nueva lista para guardar los IDs ocultos
     private ArrayAdapter<String> adaptador;
 
     @Override
@@ -23,34 +28,76 @@ public class HistorialActivity extends AppCompatActivity {
         lvCitas = findViewById(R.id.lvCitas);
         dbHelper = new DatabaseHelper(this);
         listaCitas = new ArrayList<>();
+        listaIds = new ArrayList<>(); // Inicializamos la lista de IDs
 
         cargarCitas();
+
+        // Detectar toque prolongado en un elemento de la lista
+        lvCitas.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                mostrarDialogoEliminar(position);
+                return true;
+            }
+        });
     }
 
     private void cargarCitas() {
+        // Limpiamos las listas por si recargamos los datos
+        listaCitas.clear();
+        listaIds.clear();
+
         Cursor cursor = dbHelper.obtenerCitas();
 
-        // Verificamos si hay datos
         if (cursor.getCount() == 0) {
             Toast.makeText(this, "No hay citas registradas", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Recorremos el cursor fila por fila
         while (cursor.moveToNext()) {
-            // NOTA: Ajusta los índices (0, 1, 2, 3...) dependiendo de cómo creaste tu tabla CITAS.
-            // Si la columna 0 es el ID, la 1 es la Fecha, la 2 la Hora y la 3 el Motivo:
+            // Asumimos que la columna 0 es el ID_CITA
+            int idCita = cursor.getInt(0);
             String fecha = cursor.getString(1);
             String hora = cursor.getString(2);
             String motivo = cursor.getString(3);
 
-            // Damos formato a cómo se verá cada fila en la pantalla
+            // Guardamos el ID en nuestra lista paralela
+            listaIds.add(idCita);
+
             String citaFormateada = "📅 Fecha: " + fecha + "\n⏰ Hora: " + hora + "\n🩺 Motivo: " + motivo;
             listaCitas.add(citaFormateada);
         }
 
-        // Conectamos los datos con la vista
         adaptador = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, listaCitas);
         lvCitas.setAdapter(adaptador);
+    }
+
+    // Método para mostrar la alerta de confirmación
+    private void mostrarDialogoEliminar(final int posicion) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Cancelar Cita");
+        builder.setMessage("¿Estás seguro de que deseas cancelar y eliminar esta cita?");
+
+        builder.setPositiveButton("Sí, eliminar", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // Sacamos el ID correspondiente a la posición tocada
+                int idParaBorrar = listaIds.get(posicion);
+
+                boolean eliminado = dbHelper.eliminarCita(idParaBorrar);
+                if (eliminado) {
+                    Toast.makeText(HistorialActivity.this, "Cita eliminada", Toast.LENGTH_SHORT).show();
+                    // Quitamos los datos de las listas y actualizamos la vista
+                    listaCitas.remove(posicion);
+                    listaIds.remove(posicion);
+                    adaptador.notifyDataSetChanged();
+                } else {
+                    Toast.makeText(HistorialActivity.this, "Error al eliminar", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        builder.setNegativeButton("Cancelar", null);
+        builder.show();
     }
 }

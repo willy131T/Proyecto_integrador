@@ -7,7 +7,7 @@
     android:gravity="center"
     android:background="#F8F9FA">
 
-    <!-- Ícono o Título Principal -->
+    <!-- Título Principal -->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -23,27 +23,47 @@
         android:text="Panel de Control"
         android:textSize="16sp"
         android:textColor="#666666"
-        android:layout_marginBottom="40dp"/>
+        android:layout_marginBottom="30dp"/>
 
     <!-- Botón para Agendar Cita -->
     <Button
         android:id="@+id/btnAgendarCita"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
+        android:layout_height="55dp"
         android:text="AGENDAR NUEVA CITA"
-        android:textSize="16sp"
+        android:textSize="15sp"
         android:backgroundTint="#0056b3"
-        android:layout_marginBottom="20dp"/>
+        android:layout_marginBottom="16dp"/>
 
-    <!-- Botón para Ver Historial -->
+    <!-- Botón para Ver Historial de Citas -->
     <Button
         android:id="@+id/btnVerHistorial"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
+        android:layout_height="55dp"
         android:text="MIS CITAS E HISTORIAL"
-        android:textSize="16sp"
+        android:textSize="15sp"
         android:backgroundTint="#17a2b8"
-        android:layout_marginBottom="40dp"/>
+        android:layout_marginBottom="16dp"/>
+
+    <!-- Botón para Ver la Lista de Pacientes -->
+    <Button
+        android:id="@+id/btnVerPacientes"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:text="VER LISTA DE PACIENTES"
+        android:textSize="15sp"
+        android:backgroundTint="#20c997"
+        android:layout_marginBottom="16dp"/>
+
+    <!-- NUEVO: Botón para el Historial Clínico de Pacientes -->
+    <Button
+        android:id="@+id/btnHistorialClinico"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:text="HISTORIAL CLÍNICO PACIENTES"
+        android:textSize="15sp"
+        android:backgroundTint="#6f42c1"
+        android:layout_marginBottom="30dp"/>
 
     <!-- Botón para Cerrar Sesión -->
     <Button

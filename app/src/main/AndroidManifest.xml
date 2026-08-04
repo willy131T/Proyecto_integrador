@@ -12,6 +12,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Proyecto_integrador">
         <activity
+            android:name=".VerHistorialClinicoActivity"
+            android:exported="false" />
+        <activity
+            android:name=".HistorialClinicoActivity"
+            android:exported="false" />
+        <activity
             android:name=".HistorialActivity"
             android:exported="false" />
         <activity

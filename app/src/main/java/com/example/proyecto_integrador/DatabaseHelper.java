@@ -125,6 +125,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_TABLE_PAGOS);
         db.execSQL(CREATE_TABLE_INVENTARIO);
         db.execSQL(CREATE_TABLE_USUARIOS);
+        // Crear tabla de Historial Clínico / Pacientes
+        String tablaPacientes = "CREATE TABLE PACIENTES (" +
+                "ID_PACIENTE INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "NOMBRE TEXT, " +
+                "EDAD INTEGER, " +
+                "ALERGIAS TEXT, " +
+                "TRATAMIENTO TEXT)";
+        db.execSQL(tablaPacientes);
 
         // 2. Insertamos Datos de Prueba (Seed Data)
         insertarDatosDePrueba(db);
@@ -315,5 +323,31 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return db.rawQuery("SELECT * FROM CITAS", null);
     }
 
+    // Método para eliminar una cita por su ID
+    public boolean eliminarCita(int id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        // OJO: Cambia "ID_CITA" por el nombre real de tu columna de ID
+        int resultado = db.delete("CITAS", "ID_CITA = ?", new String[]{String.valueOf(id)});
+        return resultado > 0; // Si borró al menos una fila, devuelve true
+    }
+
+    // Método para guardar un nuevo historial
+    public boolean agregarHistorial(String nombre, int edad, String alergias, String tratamiento) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues valores = new ContentValues();
+        valores.put("NOMBRE", nombre);
+        valores.put("EDAD", edad);
+        valores.put("ALERGIAS", alergias);
+        valores.put("TRATAMIENTO", tratamiento);
+
+        long resultado = db.insert("PACIENTES", null, valores);
+        return resultado != -1; // Retorna true si se guardó correctamente
+    }
+
+    // Método para obtener todos los registros de la tabla PACIENTES
+    public Cursor obtenerPacientes() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery("SELECT * FROM PACIENTES", null);
+    }
 
 }
