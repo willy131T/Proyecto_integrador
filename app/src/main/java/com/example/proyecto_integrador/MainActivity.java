@@ -1,48 +1,35 @@
 package com.example.proyecto_integrador;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.InputType;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
 
-    // Declara la variable arriba con los demás botones
-    private Button btnAgendarCita, btnVerHistorial, btnHistorialClinico, btnVerPacientes, btnInventario, btnRegistrarDoctor, btnCerrarSesion;
+    private Button btnVerPacientes, btnInventario, btnRegistrarDoctor, btnCerrarSesion;
+    private DatabaseHelper dbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Enlazamos las variables con los botones del XML
-        btnAgendarCita = findViewById(R.id.btnAgendarCita);
-        btnVerHistorial = findViewById(R.id.btnVerHistorial);
-        btnHistorialClinico = findViewById(R.id.btnHistorialClinico); // Botón para el expediente clínico
+        dbHelper = new DatabaseHelper(this);
+
+        btnVerPacientes = findViewById(R.id.btnVerPacientes);
+        btnInventario = findViewById(R.id.btnInventario);
+        btnRegistrarDoctor = findViewById(R.id.btnRegistrarDoctor);
         btnCerrarSesion = findViewById(R.id.btnCerrarSesion);
 
-        btnRegistrarDoctor = findViewById(R.id.btnRegistrarDoctor);
-
-        btnRegistrarDoctor.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mostrarDialogoRegistrarDoctor();
-            }
-        });
-        btnInventario = findViewById(R.id.btnInventario);
-        btnInventario.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, InventarioActivity.class);
-                startActivity(intent);
-            }
-        });
-        btnVerPacientes = findViewById(R.id.btnVerPacientes);
-
-
-
+        // 1. Ir a la lista de pacientes (Desde aquí se selecciona al paciente a atender)
         btnVerPacientes.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -51,34 +38,24 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // Acción: Botón Agendar Cita
-        btnAgendarCita.setOnClickListener(new View.OnClickListener() {
+        // 2. Control de Inventario
+        btnInventario.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, AgendarCitaActivity.class);
+                Intent intent = new Intent(MainActivity.this, InventarioActivity.class);
                 startActivity(intent);
             }
         });
 
-        // Acción: Botón Ver Historial de Citas
-        btnVerHistorial.setOnClickListener(new View.OnClickListener() {
+        // 3. Registrar Nuevo Doctor (Exclusivo Administrador)
+        btnRegistrarDoctor.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, HistorialActivity.class);
-                startActivity(intent);
+                mostrarDialogoRegistrarDoctor();
             }
         });
 
-        // Acción: Botón Historial Clínico (Pacientes)
-        btnHistorialClinico.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, HistorialClinicoActivity.class);
-                startActivity(intent);
-            }
-        });
-
-        // Acción: Botón Cerrar Sesión
+        // 4. Cerrar Sesión
         btnCerrarSesion.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -90,35 +67,32 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    // Método para mostrar una ventana flotante de registro de doctores
     private void mostrarDialogoRegistrarDoctor() {
-        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Registrar Nuevo Doctor");
 
-        // Creamos un diseño interno con campos de texto para el diálogo
-        android.widget.LinearLayout layout = new android.widget.LinearLayout(this);
-        layout.setOrientation(android.widget.LinearLayout.VERTICAL);
+        LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.VERTICAL);
         layout.setPadding(40, 20, 40, 20);
 
-        final android.widget.EditText inputNombre = new android.widget.EditText(this);
+        final EditText inputNombre = new EditText(this);
         inputNombre.setHint("Nombre completo");
         layout.addView(inputNombre);
 
-        final android.widget.EditText inputUsuario = new android.widget.EditText(this);
+        final EditText inputUsuario = new EditText(this);
         inputUsuario.setHint("Nombre de usuario");
         layout.addView(inputUsuario);
 
-        final android.widget.EditText inputPassword = new android.widget.EditText(this);
+        final EditText inputPassword = new EditText(this);
         inputPassword.setHint("Contraseña");
-        inputPassword.setInputType(android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        inputPassword.setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD);
         layout.addView(inputPassword);
 
         builder.setView(layout);
 
-        // Botones de acción del diálogo
-        builder.setPositiveButton("Guardar", new android.content.DialogInterface.OnClickListener() {
+        builder.setPositiveButton("Guardar", new DialogInterface.OnClickListener() {
             @Override
-            public void onClick(android.content.DialogInterface dialog, int which) {
+            public void onClick(DialogInterface dialog, int which) {
                 String nombre = inputNombre.getText().toString().trim();
                 String usuario = inputUsuario.getText().toString().trim();
                 String password = inputPassword.getText().toString().trim();
@@ -128,7 +102,6 @@ public class MainActivity extends AppCompatActivity {
                     return;
                 }
 
-                DatabaseHelper dbHelper = new DatabaseHelper(MainActivity.this);
                 boolean insertado = dbHelper.insertarUsuario(nombre, usuario, password, "dentista", "Ninguna");
 
                 if (insertado) {
@@ -139,9 +112,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        builder.setNegativeButton("Cancelar", new android.content.DialogInterface.OnClickListener() {
+        builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
             @Override
-            public void onClick(android.content.DialogInterface dialog, int which) {
+            public void onClick(DialogInterface dialog, int which) {
                 dialog.cancel();
             }
         });
