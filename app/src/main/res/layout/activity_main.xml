@@ -65,6 +65,17 @@
         android:backgroundTint="#6f42c1"
         android:layout_marginBottom="30dp"/>
 
+    <!-- Botón para Inventario -->
+    <Button
+        android:id="@+id/btnInventario"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:text="CONTROL DE INVENTARIO"
+        android:textSize="15sp"
+        android:backgroundTint="#ffc107"
+        android:textColor="#000000"
+        android:layout_marginBottom="16dp"/>
+
     <!-- Botón para Cerrar Sesión -->
     <Button
         android:id="@+id/btnCerrarSesion"

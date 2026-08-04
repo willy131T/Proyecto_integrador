@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="20dp"
+    android:background="#F8F9FA">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Control de Inventario"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:textColor="#333333"
+        android:textAlignment="center"
+        android:layout_marginBottom="16dp"/>
+
+    <!-- Formulario rápido para registrar material -->
+    <EditText
+        android:id="@+id/etNombreMaterial"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Nombre del Material (ej. Guantes de látex)"
+        android:layout_marginBottom="10dp"/>
+
+    <EditText
+        android:id="@+id/etCantidadMaterial"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Cantidad disponible"
+        android:inputType="number"
+        android:layout_marginBottom="10dp"/>
+
+    <EditText
+        android:id="@+id/etCategoriaMaterial"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Categoría (ej. Desechables, Instrumental)"
+        android:layout_marginBottom="16dp"/>
+
+    <Button
+        android:id="@+id/btnGuardarMaterial"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Registrar Material"
+        android:backgroundTint="#fd7e14"
+        android:layout_marginBottom="20dp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Materiales en Stock:"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="#333333"
+        android:layout_marginBottom="8dp"/>
+
+    <!-- Lista de inventario -->
+    <ListView
+        android:id="@+id/lvInventario"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:divider="#CCCCCC"
+        android:dividerHeight="1dp"/>
+
+</LinearLayout>

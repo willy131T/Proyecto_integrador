@@ -10,7 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 public class MainActivity extends AppCompatActivity {
 
     // Declara la variable arriba con los demás botones
-    private Button btnAgendarCita, btnVerHistorial, btnHistorialClinico, btnVerPacientes, btnCerrarSesion;
+    private Button btnAgendarCita, btnVerHistorial, btnHistorialClinico, btnVerPacientes, btnInventario, btnCerrarSesion;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,8 +22,17 @@ public class MainActivity extends AppCompatActivity {
         btnVerHistorial = findViewById(R.id.btnVerHistorial);
         btnHistorialClinico = findViewById(R.id.btnHistorialClinico); // Botón para el expediente clínico
         btnCerrarSesion = findViewById(R.id.btnCerrarSesion);
-        // Dentro deonCreate():
+        btnInventario = findViewById(R.id.btnInventario);
+        btnInventario.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, InventarioActivity.class);
+                startActivity(intent);
+            }
+        });
         btnVerPacientes = findViewById(R.id.btnVerPacientes);
+
+
 
         btnVerPacientes.setOnClickListener(new View.OnClickListener() {
             @Override

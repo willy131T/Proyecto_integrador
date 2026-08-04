@@ -124,6 +124,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_TABLE_HISTORIAL);
         db.execSQL(CREATE_TABLE_PAGOS);
         db.execSQL(CREATE_TABLE_INVENTARIO);
+        // Crear tabla de Inventario
+        String tablaInventario = "CREATE TABLE INVENTARIO (" +
+                "ID_MATERIAL INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "NOMBRE TEXT, " +
+                "CANTIDAD INTEGER, " +
+                "CATEGORIA TEXT)";
+        db.execSQL(tablaInventario);
         db.execSQL(CREATE_TABLE_USUARIOS);
         // Crear tabla de Historial Clínico / Pacientes
         String tablaPacientes = "CREATE TABLE PACIENTES (" +
@@ -348,6 +355,24 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public Cursor obtenerPacientes() {
         SQLiteDatabase db = this.getReadableDatabase();
         return db.rawQuery("SELECT * FROM PACIENTES", null);
+    }
+
+    // Método para insertar un material al inventario
+    public boolean insertarMaterial(String nombre, int cantidad, String categoria) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues valores = new ContentValues();
+        valores.put("NOMBRE", nombre);
+        valores.put("CANTIDAD", cantidad);
+        valores.put("CATEGORIA", categoria);
+
+        long resultado = db.insert("INVENTARIO", null, valores);
+        return resultado != -1;
+    }
+
+    // Método para obtener todos los materiales del inventario
+    public Cursor obtenerInventario() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery("SELECT * FROM INVENTARIO", null);
     }
 
 }
