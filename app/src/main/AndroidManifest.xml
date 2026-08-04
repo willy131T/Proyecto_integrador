@@ -11,27 +11,25 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Proyecto_integrador">
-
+        <activity
+            android:name="com.example.proyecto_integrador.AgendarCitaActivity"
+            android:exported="false" />
         <!-- LoginActivity con la ruta completa y exacta -->
         <activity
             android:name="com.example.proyecto_integrador.LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-
-        <!-- MainActivity con la ruta completa -->
+        </activity> <!-- MainActivity con la ruta completa -->
         <activity
             android:name="com.example.proyecto_integrador.MainActivity"
-            android:exported="false" />
-
-        <!-- RegistroActivity con la ruta completa -->
+            android:exported="false" /> <!-- RegistroActivity con la ruta completa -->
         <activity
             android:name="com.example.proyecto_integrador.RegistroActivity"
             android:exported="false" />
-
     </application>
 
 </manifest>

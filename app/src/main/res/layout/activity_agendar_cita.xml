@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="32dp"
+    android:background="#F8F9FA">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Agendar Nueva Cita"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:textColor="#333333"
+        android:layout_marginBottom="24dp"
+        android:layout_gravity="center_horizontal"/>
+
+    <!-- Campo para la Fecha -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Fecha (DD/MM/AAAA):"
+        android:textColor="#666666"/>
+    <EditText
+        android:id="@+id/etFechaCita"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="#FFFFFF"
+        android:padding="12dp"
+        android:inputType="date"
+        android:layout_marginBottom="16dp"/>
+
+    <!-- Campo para la Hora -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Hora (HH:MM):"
+        android:textColor="#666666"/>
+    <EditText
+        android:id="@+id/etHoraCita"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="#FFFFFF"
+        android:padding="12dp"
+        android:inputType="time"
+        android:layout_marginBottom="16dp"/>
+
+    <!-- Campo para el Motivo -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Motivo de la consulta:"
+        android:textColor="#666666"/>
+    <EditText
+        android:id="@+id/etMotivoCita"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:background="#FFFFFF"
+        android:padding="12dp"
+        android:inputType="textMultiLine"
+        android:gravity="top|start"
+        android:layout_marginBottom="32dp"/>
+
+    <!-- Botón Guardar -->
+    <Button
+        android:id="@+id/btnGuardarCita"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:text="CONFIRMAR CITA"
+        android:textSize="16sp"
+        android:backgroundTint="#28a745"/>
+
+</LinearLayout>

@@ -25,8 +25,9 @@ public class MainActivity extends AppCompatActivity {
         btnAgendarCita.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Aquí pondremos el Intent para ir a AgendarCitaActivity más adelante
-                Toast.makeText(MainActivity.this, "Abriendo calendario para agendar...", Toast.LENGTH_SHORT).show();
+                // Navegamos hacia la pantalla de agendar cita
+                Intent intent = new Intent(MainActivity.this, AgendarCitaActivity.class);
+                startActivity(intent);
             }
         });
 

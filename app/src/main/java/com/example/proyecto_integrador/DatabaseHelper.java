@@ -285,4 +285,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         valores.put(COL_INV_CANTIDAD, cantidad);
         return db.insert(TABLE_INVENTARIO, null, valores);
     }
+
+    // Método para insertar una nueva cita
+    public boolean insertarCita(String fecha, String hora, String motivo) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        // OJO: Ajusta estos nombres a las columnas reales de tu tabla CITAS
+        values.put("FECHA", fecha);
+        values.put("HORA", hora);
+        values.put("MOTIVO", motivo);
+
+        // Si tu tabla requiere el ID del paciente de forma obligatoria,
+        // puedes quemar uno temporalmente agregando: values.put("ID_PACIENTE", 1);
+
+        long resultado = db.insert("CITAS", null, values);
+
+        // Si resultado es -1, hubo un error. Si es diferente, se guardó bien.
+        return resultado != -1;
+    }
 }
