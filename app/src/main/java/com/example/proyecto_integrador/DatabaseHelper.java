@@ -191,4 +191,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         return db.rawQuery("SELECT * FROM " + TABLE_INVENTARIO, null);
     }
+
+    public boolean actualizarTratamientoPaciente(String nombre, String tratamiento) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        android.content.ContentValues values = new android.content.ContentValues();
+        values.put("tratamiento", tratamiento);
+        int resultado = db.update("usuarios", values, "nombre = ?", new String[]{nombre});
+        return resultado > 0;
+    }
+
 }

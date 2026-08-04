@@ -1,7 +1,10 @@
 package com.example.proyecto_integrador;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -25,6 +28,23 @@ public class VerHistorialClinicoActivity extends AppCompatActivity {
         listaPacientes = new ArrayList<>();
 
         cargarPacientes();
+
+        // Evento para detectar cuando el doctor selecciona un paciente de la lista
+        lvPacientes.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                // Obtenemos el texto completo del elemento seleccionado
+                String pacienteSeleccionado = listaPacientes.get(position);
+
+                // Preparamos el Intent para abrir la pantalla de detalles del paciente
+                Intent intent = new Intent(VerHistorialClinicoActivity.this, DetallePacienteActivity.class);
+
+                // Extraemos el nombre limpio y pasamos la información completa
+                intent.putExtra("nombre_paciente", pacienteSeleccionado.split("\n")[0].replace("👤 Nombre: ", ""));
+                intent.putExtra("info_paciente", pacienteSeleccionado);
+                startActivity(intent);
+            }
+        });
     }
 
     private void cargarPacientes() {
