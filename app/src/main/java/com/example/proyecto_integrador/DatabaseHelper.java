@@ -9,13 +9,14 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "ConsultorioDental.db";
-    private static final int DATABASE_VERSION = 4; // Versión actualizada para recrear limpio
+    private static final int DATABASE_VERSION = 5; // Versión actualizada para incluir la tabla de diagnósticos
 
     // Nombres de tablas
     public static final String TABLE_USUARIOS = "Usuarios";
     public static final String TABLE_PACIENTES = "pacientes";
     public static final String TABLE_CITAS = "citas";
     public static final String TABLE_INVENTARIO = "inventario";
+    public static final String TABLE_DIAGNOSTICOS = "diagnosticos"; // 🦷 Nueva tabla
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -30,7 +31,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "usuario TEXT UNIQUE, " +
                 "password TEXT, " +
                 "rol TEXT, " +
-                "alergias TEXT)");
+                "edad INTEGER, " +
+                "alergias TEXT, " +
+                "tratamiento TEXT)");
 
         // 2. Tabla de Pacientes / Historial Clínico
         db.execSQL("CREATE TABLE " + TABLE_PACIENTES + " (" +
@@ -58,6 +61,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "cantidad INTEGER NOT NULL, " +
                 "categoria TEXT)");
 
+        // 5. Tabla de Diagnósticos e Historial Clínico Independiente
+        db.execSQL("CREATE TABLE " + TABLE_DIAGNOSTICOS + " (" +
+                "id_diagnostico INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "nombre_paciente TEXT, " +
+                "cita_info TEXT, " +
+                "procedimiento TEXT, " +
+                "medicamentos TEXT, " +
+                "fecha TEXT)");
+
         // Insertar datos por defecto
         insertarDatosDePrueba(db);
     }
@@ -68,6 +80,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_PACIENTES);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_CITAS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_INVENTARIO);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_DIAGNOSTICOS);
         onCreate(db);
     }
 
@@ -116,6 +129,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put("alergias", alergias);
         long result = db.insert(TABLE_USUARIOS, null, values);
         return result != -1;
+    }
+
+    public boolean insertarUsuarioCompleto(String nombre, String usuario, String password, String rol, int edad, String alergias, String tratamiento) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("nombre", nombre);
+        values.put("usuario", usuario);
+        values.put("password", password);
+        values.put("rol", rol);
+        values.put("edad", edad);
+        values.put("alergias", alergias);
+        values.put("tratamiento", tratamiento);
+        long resultado = db.insert(TABLE_USUARIOS, null, values);
+        return resultado != -1;
     }
 
     public String validarLogin(String usuario, String password) {
@@ -174,6 +201,34 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return db.rawQuery("SELECT * FROM " + TABLE_PACIENTES, null);
     }
 
+    public boolean actualizarTratamientoPaciente(String nombre, String tratamiento) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("tratamiento", tratamiento);
+        int resultado = db.update(TABLE_PACIENTES, values, "nombre = ?", new String[]{nombre});
+        return resultado > 0;
+    }
+
+    // ==========================================
+    // MÉTODOS DE DIAGNÓSTICOS (HISTORIAL CLÍNICO)
+    // ==========================================
+    public boolean insertarDiagnostico(String nombrePaciente, String citaInfo, String procedimiento, String medicamentos, String fecha) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("nombre_paciente", nombrePaciente);
+        values.put("cita_info", citaInfo);
+        values.put("procedimiento", procedimiento);
+        values.put("medicamentos", medicamentos);
+        values.put("fecha", fecha);
+        long resultado = db.insert(TABLE_DIAGNOSTICOS, null, values);
+        return resultado != -1;
+    }
+
+    public Cursor obtenerDiagnosticosPorPaciente(String nombrePaciente) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery("SELECT * FROM " + TABLE_DIAGNOSTICOS + " WHERE nombre_paciente = ?", new String[]{nombrePaciente});
+    }
+
     // ==========================================
     // MÉTODOS DE INVENTARIO
     // ==========================================
@@ -191,13 +246,4 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         return db.rawQuery("SELECT * FROM " + TABLE_INVENTARIO, null);
     }
-
-    public boolean actualizarTratamientoPaciente(String nombre, String tratamiento) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        android.content.ContentValues values = new android.content.ContentValues();
-        values.put("tratamiento", tratamiento);
-        int resultado = db.update("usuarios", values, "nombre = ?", new String[]{nombre});
-        return resultado > 0;
-    }
-
 }

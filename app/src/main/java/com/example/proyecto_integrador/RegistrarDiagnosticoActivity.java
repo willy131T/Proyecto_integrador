@@ -9,7 +9,10 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
 
 public class RegistrarDiagnosticoActivity extends AppCompatActivity {
 
@@ -27,6 +30,9 @@ public class RegistrarDiagnosticoActivity extends AppCompatActivity {
 
         dbHelper = new DatabaseHelper(this);
         nombrePaciente = getIntent().getStringExtra("nombre_paciente");
+        if (nombrePaciente == null) {
+            nombrePaciente = "Paciente General";
+        }
 
         spinnerCitas = findViewById(R.id.spinnerCitasPaciente);
         etProcedimiento = findViewById(R.id.etProcedimientoClinico);
@@ -47,7 +53,7 @@ public class RegistrarDiagnosticoActivity extends AppCompatActivity {
         listaCitasStr = new ArrayList<>();
         Cursor cursor = dbHelper.obtenerCitas();
 
-        if (cursor.getCount() == 0) {
+        if (cursor == null || cursor.getCount() == 0) {
             listaCitasStr.add("Sin citas previas registradas");
         } else {
             while (cursor.moveToNext()) {
@@ -57,7 +63,9 @@ public class RegistrarDiagnosticoActivity extends AppCompatActivity {
                 listaCitasStr.add("Cita: " + fecha + " [" + hora + "] - " + motivo);
             }
         }
-        cursor.close();
+        if (cursor != null) {
+            cursor.close();
+        }
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, listaCitasStr);
         spinnerCitas.setAdapter(adapter);
@@ -73,15 +81,18 @@ public class RegistrarDiagnosticoActivity extends AppCompatActivity {
             return;
         }
 
-        // Estructura limpia y profesional del tratamiento unificado
-        String tratamientoFinal = "📅 " + citaSeleccionada +
-                "\n🦷 Proc: " + procedimiento +
+        String fechaActual = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(new Date());
+
+        // 1. Guardar en la nueva tabla de diagnósticos independientes
+        boolean guardadoTabla = dbHelper.insertarDiagnostico(nombrePaciente, citaSeleccionada, procedimiento, medicamentos, fechaActual);
+
+        // 2. Actualizar también el tratamiento activo para que el paciente lo vea reflejado de inmediato
+        String tratamientoCompleto = "📅 " + citaSeleccionada + "\n🦷 Proc: " + procedimiento +
                 (medicamentos.isEmpty() ? "" : "\n💊 Receta: " + medicamentos);
+        dbHelper.actualizarTratamientoPaciente(nombrePaciente, tratamientoCompleto);
 
-        boolean actualizado = dbHelper.actualizarTratamientoPaciente(nombrePaciente, tratamientoFinal);
-
-        if (actualizado) {
-            Toast.makeText(this, "¡Diagnóstico y tratamiento registrado con éxito!", Toast.LENGTH_LONG).show();
+        if (guardadoTabla) {
+            Toast.makeText(this, "¡Diagnóstico guardado en el historial clínico!", Toast.LENGTH_LONG).show();
             finish();
         } else {
             Toast.makeText(this, "Error al registrar el diagnóstico", Toast.LENGTH_SHORT).show();
