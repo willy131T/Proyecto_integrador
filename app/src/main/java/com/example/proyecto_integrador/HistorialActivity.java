@@ -1,98 +1,54 @@
 package com.example.proyecto_integrador;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
-import android.widget.Toast;
+import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
-import java.util.ArrayList;
 
 public class HistorialActivity extends AppCompatActivity {
 
-    private ListView lvCitas;
+    private TextView tvHistorial;
     private DatabaseHelper dbHelper;
-    private ArrayList<String> listaCitas;
-    private ArrayList<Integer> listaIds; // Nueva lista para guardar los IDs ocultos
-    private ArrayAdapter<String> adaptador;
+    private String nombrePaciente;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_historial);
 
-        lvCitas = findViewById(R.id.lvCitas);
+        tvHistorial = findViewById(R.id.tvHistorial);
         dbHelper = new DatabaseHelper(this);
-        listaCitas = new ArrayList<>();
-        listaIds = new ArrayList<>(); // Inicializamos la lista de IDs
 
-        cargarCitas();
+        // Recibimos el nombre del paciente desde DetallePacienteActivity
+        nombrePaciente = getIntent().getStringExtra("nombre_paciente");
+        if (nombrePaciente == null) nombrePaciente = "Desconocido";
 
-        // Detectar toque prolongado en un elemento de la lista
-        lvCitas.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                mostrarDialogoEliminar(position);
-                return true;
-            }
-        });
+        cargarHistorialClinico();
     }
 
-    private void cargarCitas() {
-        listaCitas.clear();
-        Cursor cursor = dbHelper.obtenerCitas();
+    private void cargarHistorialClinico() {
+        Cursor cursor = dbHelper.obtenerDiagnosticosParaPaciente(nombrePaciente);
+        StringBuilder sb = new StringBuilder();
 
-        if (cursor.getCount() == 0) {
-            Toast.makeText(this, "No hay citas registradas", Toast.LENGTH_SHORT).show();
-            return;
-        }
+        if (cursor != null && cursor.getCount() > 0) {
+            while (cursor.moveToNext()) {
+                String citaInfo = cursor.getString(cursor.getColumnIndexOrThrow("cita_info"));
+                String procedimiento = cursor.getString(cursor.getColumnIndexOrThrow("procedimiento"));
+                String medicamentos = cursor.getString(cursor.getColumnIndexOrThrow("medicamentos"));
+                String fecha = cursor.getString(cursor.getColumnIndexOrThrow("fecha"));
 
-        while (cursor.moveToNext()) {
-            String fecha = cursor.getString(cursor.getColumnIndexOrThrow("fecha"));
-            String hora = cursor.getString(cursor.getColumnIndexOrThrow("hora"));
-            String motivo = cursor.getString(cursor.getColumnIndexOrThrow("motivo"));
-
-            String citaFormateada = "📅 Fecha: " + fecha +
-                    "\n⏰ Hora: " + hora +
-                    "\n🩺 Motivo: " + motivo;
-            listaCitas.add(citaFormateada);
-        }
-
-        adaptador = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, listaCitas);
-        lvCitas.setAdapter(adaptador);
-        cursor.close();
-    }
-
-    // Método para mostrar la alerta de confirmación
-    private void mostrarDialogoEliminar(final int posicion) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Cancelar Cita");
-        builder.setMessage("¿Estás seguro de que deseas cancelar y eliminar esta cita?");
-
-        builder.setPositiveButton("Sí, eliminar", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                // Sacamos el ID correspondiente a la posición tocada
-                int idParaBorrar = listaIds.get(posicion);
-
-                boolean eliminado = dbHelper.eliminarCita(idParaBorrar);
-                if (eliminado) {
-                    Toast.makeText(HistorialActivity.this, "Cita eliminada", Toast.LENGTH_SHORT).show();
-                    // Quitamos los datos de las listas y actualizamos la vista
-                    listaCitas.remove(posicion);
-                    listaIds.remove(posicion);
-                    adaptador.notifyDataSetChanged();
-                } else {
-                    Toast.makeText(HistorialActivity.this, "Error al eliminar", Toast.LENGTH_SHORT).show();
+                sb.append("🗓️ Fecha: ").append(fecha).append("\n");
+                sb.append("📌 ").append(citaInfo).append("\n");
+                sb.append("🦷 Procedimiento: ").append(procedimiento).append("\n");
+                if (medicamentos != null && !medicamentos.isEmpty()) {
+                    sb.append("💊 Receta: ").append(medicamentos).append("\n");
                 }
+                sb.append("----------------------------------\n\n");
             }
-        });
-
-        builder.setNegativeButton("Cancelar", null);
-        builder.show();
+            cursor.close();
+            tvHistorial.setText(sb.toString().trim());
+        } else {
+            tvHistorial.setText("El paciente " + nombrePaciente + " aún no tiene diagnósticos o historial clínico registrado.");
+        }
     }
 }

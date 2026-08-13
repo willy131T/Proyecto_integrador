@@ -9,14 +9,14 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "ConsultorioDental.db";
-    private static final int DATABASE_VERSION = 6; // Versión actualizada para incluir la tabla de diagnósticos
+    private static final int DATABASE_VERSION = 7; // Versión 7 para aplicar la carga masiva de datos predefinidos
 
     // Nombres de tablas
     public static final String TABLE_USUARIOS = "Usuarios";
     public static final String TABLE_PACIENTES = "pacientes";
     public static final String TABLE_CITAS = "citas";
     public static final String TABLE_INVENTARIO = "inventario";
-    public static final String TABLE_DIAGNOSTICOS = "diagnosticos"; // 🦷 Nueva tabla
+    public static final String TABLE_DIAGNOSTICOS = "diagnosticos";
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -49,7 +49,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("CREATE TABLE " + TABLE_CITAS + " (" +
                 "id_cita INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "id_paciente INTEGER, " +
-                "doctor TEXT NOT NULL, " + // NUEVO CAMPO
+                "doctor TEXT NOT NULL, " +
                 "fecha TEXT NOT NULL, " +
                 "hora TEXT NOT NULL, " +
                 "motivo TEXT, " +
@@ -71,7 +71,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "medicamentos TEXT, " +
                 "fecha TEXT)");
 
-        // Insertar datos por defecto
+        // Insertar datos por defecto (Carga masiva)
         insertarDatosDePrueba(db);
     }
 
@@ -86,7 +86,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     private void insertarDatosDePrueba(SQLiteDatabase db) {
-        // --- USUARIO ADMINISTRADOR ---
+        // ==========================================
+        // USUARIOS PREDEFINIDOS
+        // ==========================================
         ContentValues valuesUser = new ContentValues();
         valuesUser.put("nombre", "Doctor Admin");
         valuesUser.put("usuario", "admin_doctor");
@@ -95,26 +97,66 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         valuesUser.put("alergias", "Ninguna");
         db.insert(TABLE_USUARIOS, null, valuesUser);
 
-        // --- USUARIO PACIENTE DE PRUEBA ---
         valuesUser.clear();
         valuesUser.put("nombre", "William Eduardo Antonio Marcelo");
         valuesUser.put("usuario", "william_p");
         valuesUser.put("password", "12345");
         valuesUser.put("rol", "paciente");
+        valuesUser.put("edad", 19);
         valuesUser.put("alergias", "Ninguna");
+        valuesUser.put("tratamiento", "📅 Cita: 20/07/2026 [16:00] - Ortodoncia\n🦷 Proc: Cambio de ligas y ajuste de arco.\n💊 Receta: Ninguno");
         db.insert(TABLE_USUARIOS, null, valuesUser);
 
-        // --- PACIENTES INICIALES ---
         db.execSQL("INSERT INTO " + TABLE_PACIENTES + " (nombre, edad, telefono, correo, alergias, tratamiento) VALUES " +
-                "('William Eduardo Antonio Marcelo', 19, '5551234567', 'william@test.com', 'Ninguna', 'Limpieza general'), " +
+                "('William Eduardo Antonio Marcelo', 19, '5551234567', 'william@test.com', 'Ninguna', 'Ortodoncia activa'), " +
                 "('Andrés', 20, '5559876543', 'andres@test.com', 'Ninguna', 'Resina'), " +
-                "('Sofi', 19, '5554567890', 'sofi@test.com', 'Penicilina', 'Ortodoncia');");
+                "('Sofi', 19, '5554567890', 'sofi@test.com', 'Penicilina', 'Revisión General');");
 
-        // --- INVENTARIO INICIAL ---
+        // ==========================================
+        // CITAS HISTÓRICAS PREDEFINIDAS
+        // ==========================================
+        db.execSQL("INSERT INTO " + TABLE_CITAS + " (id_paciente, doctor, fecha, hora, motivo, estado) VALUES " +
+                "(1, 'Dra. López', '10/05/2026', '10:00', 'Limpieza dental (Profilaxis)', 'Completada'), " +
+                "(1, 'Dr. Admin', '15/06/2026', '12:30', 'Dolor agudo / Urgencia', 'Completada'), " +
+                "(1, 'Dr. Martínez', '20/07/2026', '16:00', 'Ortodoncia (Ajuste / Revision)', 'Completada'), " +
+                "(2, 'Dr. Admin', '01/08/2026', '09:00', 'Revisión general', 'Completada');");
+
+        // ==========================================
+        // HISTORIAL CLÍNICO / DIAGNÓSTICOS PREDEFINIDOS
+        // ==========================================
+        db.execSQL("INSERT INTO " + TABLE_DIAGNOSTICOS + " (nombre_paciente, cita_info, procedimiento, medicamentos, fecha) VALUES " +
+                "('William Eduardo Antonio Marcelo', 'Cita: 10/05/2026 [10:00] - Limpieza dental', 'Profilaxis ultrasónica y pulido coronal. Se detectó caries incipiente en molar 36.', 'Enjuague con clorhexidina al 0.12% por 5 días', '10/05/2026'), " +
+                "('William Eduardo Antonio Marcelo', 'Cita: 15/06/2026 [12:30] - Dolor agudo / Urgencia', 'Eliminación de tejido cariado en pieza 36 y colocación de resina compuesta tono A2.', 'Ibuprofeno 400mg cada 8 hrs por 3 días', '15/06/2026'), " +
+                "('William Eduardo Antonio Marcelo', 'Cita: 20/07/2026 [16:00] - Ortodoncia', 'Cambio de ligas y ajuste de arco superior e inferior. Evolución favorable sin inflamación gingival.', 'Ninguno', '20/07/2026'), " +
+                "('Andrés', 'Cita: 01/08/2026 [09:00] - Revisión general', 'Revisión de rutina, toma de radiografía panorámica. Sin alteraciones visibles.', 'Ninguno', '01/08/2026');");
+
+        // ==========================================
+        // INVENTARIO AMPLIADO (Material, Medicina, Herramientas)
+        // ==========================================
         db.execSQL("INSERT INTO " + TABLE_INVENTARIO + " (nombre, cantidad, categoria) VALUES " +
-                "('Anestesia Local (Cárpules)', 50, 'Medicamentos'), " +
-                "('Resina Compuesta (Jeringas)', 30, 'Materiales'), " +
-                "('Guantes de Látex (Cajas)', 15, 'Desechables');");
+                "('Anestesia Local (Cárpules)', 150, 'Medicamentos'), " +
+                "('Ibuprofeno 400mg (Cajas)', 20, 'Medicamentos'), " +
+                "('Amoxicilina 500mg (Cajas)', 15, 'Medicamentos'), " +
+                "('Clorhexidina al 0.12% (Frascos)', 10, 'Medicamentos'), " +
+                "('Ketorolaco 10mg (Cajas)', 12, 'Medicamentos'), " +
+                "('Resina Compuesta A2 (Jeringas)', 30, 'Materiales'), " +
+                "('Resina Compuesta A3 (Jeringas)', 25, 'Materiales'), " +
+                "('Ionómero de Vidrio (Kits)', 12, 'Materiales'), " +
+                "('Ácido Grabador (Jeringas)', 18, 'Materiales'), " +
+                "('Adhesivo Dental (Frascos)', 15, 'Materiales'), " +
+                "('Cemento Quirúrgico', 8, 'Materiales'), " +
+                "('Guantes de Látex (Cajas)', 40, 'Desechables'), " +
+                "('Cubrebocas Tricapa (Cajas)', 50, 'Desechables'), " +
+                "('Eyectores de Saliva (Bolsas)', 25, 'Desechables'), " +
+                "('Algodón en Rollos (Bolsas)', 30, 'Desechables'), " +
+                "('Agujas Dentales Cortas (Cajas)', 15, 'Desechables'), " +
+                "('Baberos para Paciente (Paquetes)', 20, 'Desechables'), " +
+                "('Espejos Bucales', 20, 'Instrumental'), " +
+                "('Exploradores Dentales', 15, 'Instrumental'), " +
+                "('Pinzas Algodoneras', 15, 'Instrumental'), " +
+                "('Jeringas Carpule', 10, 'Instrumental'), " +
+                "('Fórceps para Extracción', 8, 'Instrumental'), " +
+                "('Curetas periodontales', 12, 'Instrumental');");
     }
 
     // ==========================================
@@ -161,7 +203,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     // ==========================================
     // MÉTODOS DE CITAS
     // ==========================================
-    // NUEVO MÉTODO: Validar disponibilidad de horario
     public boolean verificarDisponibilidadHorario(String fecha, String hora, String doctor) {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_CITAS + " WHERE fecha = ? AND hora = ? AND doctor = ?",
@@ -169,9 +210,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         boolean estaOcupado = (cursor.getCount() > 0);
         cursor.close();
-        return estaOcupado; // Si retorna true, el horario ya está tomado
+        return estaOcupado;
     }
-    // MÉTODO ACTUALIZADO: Insertar cita (ahora recibe el doctor)
+
     public boolean insertarCita(String doctor, String fecha, String hora, String motivo) {
         SQLiteDatabase db = this.getWritableDatabase();
         android.content.ContentValues values = new android.content.ContentValues();
@@ -260,8 +301,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         return db.rawQuery("SELECT * FROM " + TABLE_INVENTARIO, null);
     }
+
     // ==========================================
-    // funciones extra
+    // FUNCIONES EXTRA
     // ==========================================
     public Cursor obtenerUsuarioPorUsername(String usuario) {
         SQLiteDatabase db = this.getReadableDatabase();
@@ -285,5 +327,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return db.rawQuery("SELECT * FROM " + TABLE_DIAGNOSTICOS + " WHERE nombre_paciente = ? OR nombre_paciente = ?",
                 new String[]{nombreReal, usuarioOIdentificador});
     }
+    // ==========================================
+    // NUEVOS MÉTODOS DE INVENTARIO (EDITAR Y ELIMINAR)
+    // ==========================================
+    public boolean actualizarMaterial(int id, String nombre, int cantidad, String categoria) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        android.content.ContentValues valores = new android.content.ContentValues();
+        valores.put("nombre", nombre);
+        valores.put("cantidad", cantidad);
+        valores.put("categoria", categoria);
+        int resultado = db.update(TABLE_INVENTARIO, valores, "id_material = ?", new String[]{String.valueOf(id)});
+        return resultado > 0;
+    }
 
+    public boolean eliminarMaterial(int id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        int resultado = db.delete(TABLE_INVENTARIO, "id_material = ?", new String[]{String.valueOf(id)});
+        return resultado > 0;
+    }
 }

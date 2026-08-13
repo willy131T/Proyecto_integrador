@@ -135,19 +135,56 @@ public class PacienteActivity extends AppCompatActivity {
 
     private void cargarProximaCita() {
         Cursor cursor = dbHelper.obtenerCitas();
+
         if (cursor != null && cursor.getCount() > 0) {
             if (cursor.moveToLast()) {
                 String fecha = cursor.getString(cursor.getColumnIndexOrThrow("fecha"));
                 String hora = cursor.getString(cursor.getColumnIndexOrThrow("hora"));
                 String motivo = cursor.getString(cursor.getColumnIndexOrThrow("motivo"));
 
-                tvProximaCita.setText("📅 Fecha: " + fecha + "\n⏰ Hora: " + hora + "\n🦷 Motivo: " + motivo);
+                tvProximaCita.setText("📅 Fecha: " + fecha + "\n⏰ Hora: " + hora + "\n🦷 Motivo: " + motivo + "\n\n👉 Toca aquí para ver todas las citas");
             }
         } else {
             tvProximaCita.setText("No tienes citas agendadas actualmente.");
         }
-        if (cursor != null) {
+
+        // Hacer que el texto sea clickeable para mostrar el historial completo
+        tvProximaCita.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mostrarTodasLasCitas();
+            }
+        });
+
+        if (cursor != null) cursor.close();
+    }
+
+    // Nuevo método para mostrar el cuadro de diálogo
+    private void mostrarTodasLasCitas() {
+        Cursor cursor = dbHelper.obtenerCitas();
+        StringBuilder sb = new StringBuilder();
+
+        if (cursor != null && cursor.getCount() > 0) {
+            while (cursor.moveToNext()) {
+                String fecha = cursor.getString(cursor.getColumnIndexOrThrow("fecha"));
+                String hora = cursor.getString(cursor.getColumnIndexOrThrow("hora"));
+                String motivo = cursor.getString(cursor.getColumnIndexOrThrow("motivo"));
+                String doctor = cursor.getString(cursor.getColumnIndexOrThrow("doctor"));
+
+                sb.append("📅 ").append(fecha).append(" a las ").append(hora).append("\n");
+                sb.append("👨‍⚕️ ").append(doctor).append("\n");
+                sb.append("🦷 Motivo: ").append(motivo).append("\n");
+                sb.append("----------------------------\n");
+            }
             cursor.close();
+        } else {
+            sb.append("No hay citas registradas.");
         }
+
+        new android.app.AlertDialog.Builder(this)
+                .setTitle("📅 Todas las Citas Agendadas")
+                .setMessage(sb.toString())
+                .setPositiveButton("Cerrar", null)
+                .show();
     }
 }

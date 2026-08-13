@@ -1,127 +1,169 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F8F9FA"
-    android:padding="20dp">
+    android:background="#F4F7FC"
+    android:fillViewport="true">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="24dp">
 
-        <!-- Encabezado de Bienvenida -->
-        <TextView
-            android:id="@+id/tvBienvenidaPaciente"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="¡Bienvenido, Paciente!"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:textColor="#333333"
-            android:layout_marginBottom="16dp"/>
-
-        <!-- Tarjeta 1: Mis Datos y Alergias -->
+        <!-- Encabezado con Ícono del Paciente -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="#FFFFFF"
-            android:padding="16dp"
-            android:layout_marginBottom="14dp"
-            android:elevation="2dp">
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="24dp">
+
+            <!-- Aquí puedes cambiar el @android:drawable/... por tu propia imagen de drawable -->
+            <ImageView
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:src="@android:drawable/ic_menu_myplaces"
+                app:tint="#0284C7" />
 
             <TextView
+                android:id="@+id/tvBienvenidaPaciente"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="👤 Mis Datos Médicos"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:textColor="#0056b3"
-                android:layout_marginBottom="8dp"/>
-
-            <TextView
-                android:id="@+id/tvDatosPacienteInfo"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Edad y Alergias cargando..."
-                android:textSize="14sp"
-                android:textColor="#555555"/>
+                android:layout_marginStart="16dp"
+                android:text="¡Hola, Paciente!"
+                android:textColor="#1E293B"
+                android:textSize="26sp"
+                android:textStyle="bold" />
         </LinearLayout>
 
-        <!-- Tarjeta 2: Tratamiento y Receta Activa -->
-        <LinearLayout
+        <!-- Tarjeta 1: Mis Datos -->
+        <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="#FFFFFF"
-            android:padding="16dp"
-            android:layout_marginBottom="14dp"
-            android:elevation="2dp">
+            android:layout_marginBottom="16dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="4dp"
+            app:cardBackgroundColor="#FFFFFF">
 
-            <TextView
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="🦷 Tratamiento y Receta Activa"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:textColor="#28a745"
-                android:layout_marginBottom="8dp"/>
+                android:orientation="vertical"
+                android:padding="20dp">
 
-            <TextView
-                android:id="@+id/tvTratamientoPacienteInfo"
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="👤 Mis Datos Médicos"
+                    android:textColor="#0284C7"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="8dp"/>
+
+                <TextView
+                    android:id="@+id/tvDatosPacienteInfo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Cargando datos..."
+                    android:textColor="#475569"
+                    android:textSize="15sp"
+                    android:lineSpacingExtra="4dp"/>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Tarjeta 2: Tratamientos -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="4dp"
+            app:cardBackgroundColor="#FFFFFF">
+
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Sin tratamientos activos recientes."
-                android:textSize="14sp"
-                android:textColor="#555555"/>
-        </LinearLayout>
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🦷 Mi Historial Clínico"
+                    android:textColor="#10B981"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="8dp"/>
+
+                <TextView
+                    android:id="@+id/tvTratamientoPacienteInfo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Sin tratamientos activos."
+                    android:textColor="#475569"
+                    android:textSize="15sp"
+                    android:lineSpacingExtra="4dp"/>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
 
         <!-- Tarjeta 3: Próxima Cita -->
-        <LinearLayout
+        <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="#FFFFFF"
-            android:padding="16dp"
-            android:layout_marginBottom="24dp"
-            android:elevation="2dp">
+            android:layout_marginBottom="32dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="4dp"
+            app:cardBackgroundColor="#FFFFFF">
 
-            <TextView
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="📅 Próxima Cita Programada"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:textColor="#17a2b8"
-                android:layout_marginBottom="8dp"/>
+                android:orientation="vertical"
+                android:padding="20dp">
 
-            <TextView
-                android:id="@+id/tvProximaCitaPaciente"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="No tienes citas agendadas."
-                android:textSize="14sp"
-                android:textColor="#555555"/>
-        </LinearLayout>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="📅 Próxima Cita"
+                    android:textColor="#F59E0B"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="8dp"/>
 
-        <!-- Botones de Acción -->
+                <TextView
+                    android:id="@+id/tvProximaCitaPaciente"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="No tienes citas agendadas."
+                    android:textColor="#475569"
+                    android:textSize="15sp"
+                    android:lineSpacingExtra="4dp"/>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Botones de Acción Estilizados -->
         <Button
             android:id="@+id/btnAgendarCitaPaciente"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="60dp"
             android:text="AGENDAR NUEVA CITA"
-            android:textSize="14sp"
-            android:backgroundTint="#0056b3"
-            android:layout_marginBottom="12dp"/>
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="#0284C7"
+            app:cornerRadius="12dp"
+            android:layout_marginBottom="16dp"/>
 
         <Button
             android:id="@+id/btnCerrarSesionPaciente"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="CERRAR SESIÓN"
-            android:textColor="#dc3545"
-            android:backgroundTint="#FFFFFF"
+            android:layout_height="55dp"
+            android:text="Cerrar Sesión"
+            android:textSize="16sp"
+            android:textColor="#EF4444"
+            android:backgroundTint="#00000000"
             style="?android:attr/borderlessButtonStyle"/>
 
     </LinearLayout>

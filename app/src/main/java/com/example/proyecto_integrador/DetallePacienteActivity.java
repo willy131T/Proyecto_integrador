@@ -45,6 +45,7 @@ public class DetallePacienteActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(DetallePacienteActivity.this, HistorialActivity.class);
+                intent.putExtra("nombre_paciente", nombrePaciente); // ⬅️ AGREGA ESTA LÍNEA
                 startActivity(intent);
             }
         });
