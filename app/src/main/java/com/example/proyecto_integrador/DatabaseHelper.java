@@ -9,7 +9,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "ConsultorioDental.db";
-    private static final int DATABASE_VERSION = 7; // Versión 7 para aplicar la carga masiva de datos predefinidos
+    private static final int DATABASE_VERSION = 8; // Versión 8 para creacion de cuentas
 
     // Nombres de tablas
     public static final String TABLE_USUARIOS = "Usuarios";
@@ -87,9 +87,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private void insertarDatosDePrueba(SQLiteDatabase db) {
         // ==========================================
-        // USUARIOS PREDEFINIDOS
+        // 🧑‍⚕️ CUENTAS DE DOCTORES (ADMINISTRADORES)
         // ==========================================
         ContentValues valuesUser = new ContentValues();
+
+        // Doctor 1
         valuesUser.put("nombre", "Doctor Admin");
         valuesUser.put("usuario", "admin_doctor");
         valuesUser.put("password", "12345");
@@ -97,6 +99,28 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         valuesUser.put("alergias", "Ninguna");
         db.insert(TABLE_USUARIOS, null, valuesUser);
 
+        // Doctor 2
+        valuesUser.clear();
+        valuesUser.put("nombre", "Dra. López");
+        valuesUser.put("usuario", "dra_lopez");
+        valuesUser.put("password", "12345");
+        valuesUser.put("rol", "dentista");
+        valuesUser.put("alergias", "Ninguna");
+        db.insert(TABLE_USUARIOS, null, valuesUser);
+
+        // Doctor 3
+        valuesUser.clear();
+        valuesUser.put("nombre", "Dr. Martínez");
+        valuesUser.put("usuario", "dr_martinez");
+        valuesUser.put("password", "12345");
+        valuesUser.put("rol", "dentista");
+        valuesUser.put("alergias", "Ninguna");
+        db.insert(TABLE_USUARIOS, null, valuesUser);
+
+        // ==========================================
+        // 👤 CUENTAS DE PACIENTES
+        // ==========================================
+        // Paciente 1 (Tú)
         valuesUser.clear();
         valuesUser.put("nombre", "William Eduardo Antonio Marcelo");
         valuesUser.put("usuario", "william_p");
@@ -107,6 +131,31 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         valuesUser.put("tratamiento", "📅 Cita: 20/07/2026 [16:00] - Ortodoncia\n🦷 Proc: Cambio de ligas y ajuste de arco.\n💊 Receta: Ninguno");
         db.insert(TABLE_USUARIOS, null, valuesUser);
 
+        // Paciente 2 (Andrés)
+        valuesUser.clear();
+        valuesUser.put("nombre", "Andrés");
+        valuesUser.put("usuario", "andres_p");
+        valuesUser.put("password", "12345");
+        valuesUser.put("rol", "paciente");
+        valuesUser.put("edad", 20);
+        valuesUser.put("alergias", "Ninguna");
+        valuesUser.put("tratamiento", "📅 Cita: 01/08/2026 [09:00] - Revisión general\n🦷 Proc: Revisión de rutina\n💊 Receta: Ninguno");
+        db.insert(TABLE_USUARIOS, null, valuesUser);
+
+        // Paciente 3 (Sofi)
+        valuesUser.clear();
+        valuesUser.put("nombre", "Sofi");
+        valuesUser.put("usuario", "sofi_p");
+        valuesUser.put("password", "12345");
+        valuesUser.put("rol", "paciente");
+        valuesUser.put("edad", 19);
+        valuesUser.put("alergias", "Penicilina");
+        valuesUser.put("tratamiento", "Sin tratamientos activos");
+        db.insert(TABLE_USUARIOS, null, valuesUser);
+
+        // ==========================================
+        // REGISTROS EN LA TABLA PACIENTES (Para que el doctor los vea en su lista)
+        // ==========================================
         db.execSQL("INSERT INTO " + TABLE_PACIENTES + " (nombre, edad, telefono, correo, alergias, tratamiento) VALUES " +
                 "('William Eduardo Antonio Marcelo', 19, '5551234567', 'william@test.com', 'Ninguna', 'Ortodoncia activa'), " +
                 "('Andrés', 20, '5559876543', 'andres@test.com', 'Ninguna', 'Resina'), " +
