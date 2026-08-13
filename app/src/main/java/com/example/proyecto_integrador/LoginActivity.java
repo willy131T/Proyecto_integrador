@@ -11,10 +11,10 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class LoginActivity extends AppCompatActivity {
 
-    // 1. Variables para nuestros elementos del XML
+    // 1. Variables para nuestros elementos del XML (Actualizadas con los nombres correctos)
     private EditText etUsuario, etPassword;
-    private Button btnLogin;
-    private TextView tvRegistrarse;
+    private Button btnIngresar;
+    private TextView tvRegistro;
 
     // 2. Variable para conectar con nuestra base de datos
     private DatabaseHelper dbHelper;
@@ -27,14 +27,14 @@ public class LoginActivity extends AppCompatActivity {
         // Inicializamos la base de datos
         dbHelper = new DatabaseHelper(this);
 
-        // Enlazamos las variables de Java con los IDs del XML
+        // Enlazamos las variables de Java con los IDs exactos del nuevo diseño XML
         etUsuario = findViewById(R.id.etUsuario);
         etPassword = findViewById(R.id.etPassword);
-        btnLogin = findViewById(R.id.btnLogin);
-        tvRegistrarse = findViewById(R.id.tvRegistrarse);
+        btnIngresar = findViewById(R.id.btnIngresar); // Corregido aquí
+        tvRegistro = findViewById(R.id.tvRegistro);   // Corregido aquí
 
         // Acción al hacer clic en el botón de Iniciar Sesión
-        btnLogin.setOnClickListener(new View.OnClickListener() {
+        btnIngresar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 iniciarSesion();
@@ -42,7 +42,7 @@ public class LoginActivity extends AppCompatActivity {
         });
 
         // Acción al hacer clic en el texto de Registro
-        tvRegistrarse.setOnClickListener(new View.OnClickListener() {
+        tvRegistro.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(LoginActivity.this, RegistroActivity.class);
@@ -66,19 +66,22 @@ public class LoginActivity extends AppCompatActivity {
         // Validación 2: Consultamos a la base de datos qué rol tiene este usuario
         String rol = dbHelper.validarLogin(usuario, password);
 
-        if (rol.equals("dentista")) {
-            // Panel completo para el Administrador / Doctor
-            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-            startActivity(intent);
-            finish();
-        } else if (rol.equals("paciente")) {
-            // Panel limitado y específico para el Paciente
-            Intent intent = new Intent(LoginActivity.this, PacienteActivity.class);
-            intent.putExtra("nombre_usuario", usuario);
-            startActivity(intent);
-            finish();
+        // Validación 3: Protegemos contra nulos para que no crashee la app si el usuario no existe
+        if (rol != null) {
+            if (rol.equals("dentista")) {
+                // Panel completo para el Administrador / Doctor
+                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                startActivity(intent);
+                finish();
+            } else if (rol.equals("paciente")) {
+                // Panel limitado y específico para el Paciente
+                Intent intent = new Intent(LoginActivity.this, PacienteActivity.class);
+                intent.putExtra("nombre_usuario", usuario);
+                startActivity(intent);
+                finish();
+            }
         } else {
-            // Si el rol es nulo, los datos son incorrectos
+            // Si el rol es nulo, los datos son incorrectos o el usuario no existe
             Toast.makeText(this, "Usuario o contraseña incorrectos", Toast.LENGTH_SHORT).show();
         }
     }
