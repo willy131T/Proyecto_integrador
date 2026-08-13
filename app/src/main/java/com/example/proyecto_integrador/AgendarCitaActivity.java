@@ -14,6 +14,14 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import java.util.Calendar;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
+import android.os.Build;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 public class AgendarCitaActivity extends AppCompatActivity {
 
@@ -151,17 +159,73 @@ public class AgendarCitaActivity extends AppCompatActivity {
             return; // Detenemos el guardado para que el usuario intente con otro horario
         }
 
-        // Si pasó todas las validaciones, procedemos a guardar (enviamos también el doctor)
+        // Si pasó todas las validaciones, procedemos a guardar
         boolean guardado = dbHelper.insertarCita(doctorSeleccionado, fecha, hora, motivoFinal);
 
         if (guardado) {
             Toast.makeText(this, "✅ ¡Cita agendada con éxito!", Toast.LENGTH_LONG).show();
 
-            // TODO: Aquí configuraremos más adelante el AlarmManager para el sistema de notificaciones automáticas.
+            // ⬇️ LLAMAMOS AL NUEVO MÉTODO DE NOTIFICACIONES AQUÍ
+            programarRecordatorio(fecha, hora, doctorSeleccionado);
 
-            finish(); // Cerramos la pantalla actual y volvemos a la anterior
+            finish();
         } else {
             Toast.makeText(this, "Error al agendar la cita", Toast.LENGTH_SHORT).show();
+        }
+    }
+    private void programarRecordatorio(String fecha, String hora, String doctor) {
+        try {
+            // Juntamos la fecha y hora seleccionada para procesarla
+            String fechaHoraCita = fecha + " " + hora;
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
+            Date date = sdf.parse(fechaHoraCita);
+
+            if (date != null) {
+                long tiempoCitaEnMilisegundos = date.getTime();
+
+                // Le restamos 24 horas en milisegundos (1 día antes)
+                //long tiempoRecordatorio = tiempoCitaEnMilisegundos - (24 * 60 * 60 * 1000);
+
+                /*
+                 * NOTA PARA TUS PRUEBAS (PRESENTACIÓN):
+                 * Si quieres probar que la notificación llega de inmediato (en 10 segundos)
+                 * en lugar de esperar hasta 1 día antes de la fecha real, comenta la línea
+                 * de arriba y descomenta la de abajo:
+                 *
+                 * long tiempoRecordatorio = System.currentTimeMillis() + 10000;
+                 */
+                long tiempoRecordatorio = System.currentTimeMillis() + 10000;
+
+                // Preparamos el paquete de datos para mandarlo al RecordatorioReceiver
+                Intent intent = new Intent(this, RecordatorioReceiver.class);
+                intent.putExtra("fecha", fecha);
+                intent.putExtra("hora", hora);
+                intent.putExtra("doctor", doctor);
+
+                // IMPORTANTE: En Android 12+ se requiere FLAG_IMMUTABLE
+                PendingIntent pendingIntent = PendingIntent.getBroadcast(
+                        this,
+                        0,
+                        intent,
+                        PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+                );
+
+                AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+
+                if (alarmManager != null) {
+                    // Validamos permisos extras para Android 12+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !alarmManager.canScheduleExactAlarms()) {
+                        Toast.makeText(this, "La app requiere permiso para programar alarmas exactas.", Toast.LENGTH_LONG).show();
+                        return; // Opcionalmente puedes redirigir a los ajustes del teléfono aquí
+                    }
+
+                    // Programamos la alarma exacta
+                    alarmManager.setExact(AlarmManager.RTC_WAKEUP, tiempoRecordatorio, pendingIntent);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Aviso: No se pudo programar la notificación automática.", Toast.LENGTH_SHORT).show();
         }
     }
 }
