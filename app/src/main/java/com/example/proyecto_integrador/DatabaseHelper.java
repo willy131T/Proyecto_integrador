@@ -9,7 +9,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "ConsultorioDental.db";
-    private static final int DATABASE_VERSION = 5; // Versión actualizada para incluir la tabla de diagnósticos
+    private static final int DATABASE_VERSION = 6; // Versión actualizada para incluir la tabla de diagnósticos
 
     // Nombres de tablas
     public static final String TABLE_USUARIOS = "Usuarios";
@@ -45,10 +45,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "alergias TEXT, " +
                 "tratamiento TEXT)");
 
-        // 3. Tabla de Citas
+        // 3. Tabla de Citas ACTUALIZADA (Agregamos la columna 'doctor')
         db.execSQL("CREATE TABLE " + TABLE_CITAS + " (" +
                 "id_cita INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "id_paciente INTEGER, " +
+                "doctor TEXT NOT NULL, " + // NUEVO CAMPO
                 "fecha TEXT NOT NULL, " +
                 "hora TEXT NOT NULL, " +
                 "motivo TEXT, " +
@@ -160,13 +161,26 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     // ==========================================
     // MÉTODOS DE CITAS
     // ==========================================
-    public boolean insertarCita(String fecha, String hora, String motivo) {
+    // NUEVO MÉTODO: Validar disponibilidad de horario
+    public boolean verificarDisponibilidadHorario(String fecha, String hora, String doctor) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_CITAS + " WHERE fecha = ? AND hora = ? AND doctor = ?",
+                new String[]{fecha, hora, doctor});
+
+        boolean estaOcupado = (cursor.getCount() > 0);
+        cursor.close();
+        return estaOcupado; // Si retorna true, el horario ya está tomado
+    }
+    // MÉTODO ACTUALIZADO: Insertar cita (ahora recibe el doctor)
+    public boolean insertarCita(String doctor, String fecha, String hora, String motivo) {
         SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues values = new ContentValues();
+        android.content.ContentValues values = new android.content.ContentValues();
+        values.put("doctor", doctor);
         values.put("fecha", fecha);
         values.put("hora", hora);
         values.put("motivo", motivo);
         values.put("estado", "Pendiente");
+
         long resultado = db.insert(TABLE_CITAS, null, values);
         return resultado != -1;
     }
