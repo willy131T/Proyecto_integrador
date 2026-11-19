@@ -6,11 +6,17 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import java.util.List;
+import java.util.Map;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class PacienteActivity extends AppCompatActivity {
 
-    private TextView tvBienvenida, tvDatosInfo, tvTratamientoInfo, tvProximaCita;
+    private TextView tvBienvenida, tvDatosPaciente, tvTratamiento, tvProximaCita;
     private Button btnAgendar, btnCerrarSesion;
     private DatabaseHelper dbHelper;
     private String nombreUsuarioLogueado;
@@ -23,26 +29,22 @@ public class PacienteActivity extends AppCompatActivity {
         dbHelper = new DatabaseHelper(this);
 
         tvBienvenida = findViewById(R.id.tvBienvenidaPaciente);
-        tvDatosInfo = findViewById(R.id.tvDatosPacienteInfo);
-        tvTratamientoInfo = findViewById(R.id.tvTratamientoPacienteInfo);
+        tvDatosPaciente = findViewById(R.id.tvDatosPacienteInfo);
+        tvTratamiento = findViewById(R.id.tvTratamientoPacienteInfo);
         tvProximaCita = findViewById(R.id.tvProximaCitaPaciente);
         btnAgendar = findViewById(R.id.btnAgendarCitaPaciente);
         btnCerrarSesion = findViewById(R.id.btnCerrarSesionPaciente);
 
-        // Recibimos el nombre del usuario que inició sesión
+        // Recibimos el usuario logueado
         nombreUsuarioLogueado = getIntent().getStringExtra("nombre_usuario");
         if (nombreUsuarioLogueado == null) {
-            nombreUsuarioLogueado = "Paciente";
+            nombreUsuarioLogueado = "william_p";
         }
 
-        tvBienvenida.setText("¡Hola, " + nombreUsuarioLogueado + "!");
-
-        cargarDatosPaciente();
-        cargarDiagnosticosYTratamientos();
+        cargarDatosUsuario();
+        cargarHistorialClinicoPaciente();
         cargarProximaCita();
 
-
-        // Botón para agendar cita
         btnAgendar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -52,12 +54,10 @@ public class PacienteActivity extends AppCompatActivity {
             }
         });
 
-        // Botón cerrar sesión
         btnCerrarSesion.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(PacienteActivity.this, LoginActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);
                 finish();
             }
@@ -67,47 +67,68 @@ public class PacienteActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        // Refrescamos toda la información al volver a la pantalla
-        cargarDatosPaciente();
-        cargarDiagnosticosYTratamientos();
         cargarProximaCita();
+        cargarHistorialClinicoPaciente();
     }
 
-    private void cargarDatosPaciente() {
-        // Consultamos directo en la tabla de usuarios usando el username con el que inició sesión
+    private void cargarDatosUsuario() {
         Cursor cursor = dbHelper.obtenerUsuarioPorUsername(nombreUsuarioLogueado);
-        boolean encontrado = false;
-
         if (cursor != null && cursor.moveToFirst()) {
-            // Verificamos si la tabla tiene columnas de edad y alergias
-            try {
-                int edad = cursor.getInt(cursor.getColumnIndexOrThrow("edad"));
-                String alergias = cursor.getString(cursor.getColumnIndexOrThrow("alergias"));
-                String nombreReal = cursor.getString(cursor.getColumnIndexOrThrow("nombre"));
+            String nombreReal = cursor.getString(cursor.getColumnIndexOrThrow("nombre"));
+            int edad = cursor.getInt(cursor.getColumnIndexOrThrow("edad"));
+            String alergias = cursor.getString(cursor.getColumnIndexOrThrow("alergias"));
 
-                if (alergias == null || alergias.isEmpty()) alergias = "Ninguna";
+            tvBienvenida.setText("¡Hola, " + nombreReal + "!");
+            tvDatosPaciente.setText("🎂 Edad: " + edad + " años\n⚠️ Alergias: " + (alergias != null ? alergias : "Ninguna"));
 
-                // Si quieres actualizar el saludo con su nombre real de registro:
-                if (nombreReal != null && !nombreReal.isEmpty()) {
-                    tvBienvenida.setText("¡Hola, " + nombreReal + "!");
-                }
-
-                tvDatosInfo.setText("🎂 Edad: " + edad + " años\n⚠️ Alergias: " + alergias);
-                encontrado = true;
-            } catch (Exception e) {
-                // Por si acaso la columna de edad viene vacía o nula
-                tvDatosInfo.setText("🎂 Edad: No registrada\n⚠️ Alergias: Ninguna");
-            }
+            // Actualizamos al nombre real para que coincida exactamente con los registros de la BD
+            nombreUsuarioLogueado = nombreReal;
             cursor.close();
-        }
-
-        if (!encontrado) {
-            tvDatosInfo.setText("🎂 Edad: No registrada\n⚠️ Alergias: Ninguna");
+        } else {
+            if (cursor != null) cursor.close();
+            tvBienvenida.setText("¡Hola, Paciente!");
+            tvDatosPaciente.setText("No se encontraron datos médicos.");
         }
     }
 
-    private void cargarDiagnosticosYTratamientos() {
-        // Usamos el nuevo método seguro de la base de datos
+    private void cargarHistorialClinicoPaciente() {
+        // 1. Intentar cargar diagnósticos desde la API central
+        RetrofitClient.getApiService().obtenerDiagnosticos(nombreUsuarioLogueado).enqueue(new Callback<Map<String, Object>>() {
+            @Override
+            public void onResponse(Call<Map<String, Object>> call, Response<Map<String, Object>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<Map<String, Object>> lista = (List<Map<String, Object>>) response.body().get("diagnosticos");
+                    if (lista != null && !lista.isEmpty()) {
+                        StringBuilder sb = new StringBuilder();
+                        for (Map<String, Object> d : lista) {
+                            String fecha = (String) d.get("fecha");
+                            String citaInfo = (String) d.get("cita_info");
+                            String procedimiento = (String) d.get("procedimiento");
+                            String medicamentos = (String) d.get("medicamentos");
+
+                            sb.append("🗓️ Fecha: ").append(fecha).append("\n");
+                            sb.append("📌 ").append(citaInfo).append("\n");
+                            sb.append("🦷 Procedimiento: ").append(procedimiento).append("\n");
+                            if (medicamentos != null && !medicamentos.isEmpty() && !medicamentos.equals("Ninguno")) {
+                                sb.append("💊 Receta: ").append(medicamentos).append("\n");
+                            }
+                            sb.append("----------------------------------\n\n");
+                        }
+                        tvTratamiento.setText(sb.toString().trim());
+                        return;
+                    }
+                }
+                cargarHistorialLocal();
+            }
+
+            @Override
+            public void onFailure(Call<Map<String, Object>> call, Throwable t) {
+                cargarHistorialLocal();
+            }
+        });
+    }
+
+    private void cargarHistorialLocal() {
         Cursor cursor = dbHelper.obtenerDiagnosticosParaPaciente(nombreUsuarioLogueado);
         StringBuilder sb = new StringBuilder();
 
@@ -124,17 +145,50 @@ public class PacienteActivity extends AppCompatActivity {
                 if (medicamentos != null && !medicamentos.isEmpty()) {
                     sb.append("💊 Receta: ").append(medicamentos).append("\n");
                 }
-                sb.append("----------------------------------\n");
+                sb.append("----------------------------------\n\n");
             }
             cursor.close();
-            tvTratamientoInfo.setText(sb.toString().trim());
+            tvTratamiento.setText(sb.toString().trim());
         } else {
-            tvTratamientoInfo.setText("No tienes tratamientos o diagnósticos registrados todavía.");
+            tvTratamiento.setText("No tienes tratamientos o diagnósticos registrados todavía.");
         }
     }
 
     private void cargarProximaCita() {
-        Cursor cursor = dbHelper.obtenerCitas();
+        // 1. Intentar cargar próxima cita desde la API central
+        RetrofitClient.getApiService().obtenerProximaCita(nombreUsuarioLogueado).enqueue(new Callback<Map<String, Object>>() {
+            @Override
+            public void onResponse(Call<Map<String, Object>> call, Response<Map<String, Object>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    Map<String, Object> proxima = (Map<String, Object>) response.body().get("proxima_cita");
+                    if (proxima != null) {
+                        String fecha = (String) proxima.get("fecha");
+                        String hora = (String) proxima.get("hora");
+                        String motivo = (String) proxima.get("motivo");
+                        String doctor = (String) proxima.get("doctor");
+
+                        tvProximaCita.setText("📅 Fecha: " + fecha + "\n⏰ Hora: " + hora + "\n👨‍⚕️ Doctor: " + doctor + "\n🦷 Motivo: " + motivo + "\n\n👉 Toca aquí para ver todas las citas");
+                        tvProximaCita.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                mostrarTodasLasCitasDelPaciente();
+                            }
+                        });
+                        return;
+                    }
+                }
+                cargarProximaCitaLocal();
+            }
+
+            @Override
+            public void onFailure(Call<Map<String, Object>> call, Throwable t) {
+                cargarProximaCitaLocal();
+            }
+        });
+    }
+
+    private void cargarProximaCitaLocal() {
+        Cursor cursor = dbHelper.obtenerCitasPorPaciente(nombreUsuarioLogueado);
 
         if (cursor != null && cursor.getCount() > 0) {
             if (cursor.moveToLast()) {
@@ -148,20 +202,18 @@ public class PacienteActivity extends AppCompatActivity {
             tvProximaCita.setText("No tienes citas agendadas actualmente.");
         }
 
-        // Hacer que el texto sea clickeable para mostrar el historial completo
         tvProximaCita.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mostrarTodasLasCitas();
+                mostrarTodasLasCitasDelPaciente();
             }
         });
 
         if (cursor != null) cursor.close();
     }
 
-    // Nuevo método para mostrar el cuadro de diálogo
-    private void mostrarTodasLasCitas() {
-        Cursor cursor = dbHelper.obtenerCitas();
+    private void mostrarTodasLasCitasDelPaciente() {
+        Cursor cursor = dbHelper.obtenerCitasPorPaciente(nombreUsuarioLogueado);
         StringBuilder sb = new StringBuilder();
 
         if (cursor != null && cursor.getCount() > 0) {
@@ -181,7 +233,7 @@ public class PacienteActivity extends AppCompatActivity {
             sb.append("No hay citas registradas.");
         }
 
-        new android.app.AlertDialog.Builder(this)
+        new AlertDialog.Builder(this)
                 .setTitle("📅 Todas las Citas Agendadas")
                 .setMessage(sb.toString())
                 .setPositiveButton("Cerrar", null)

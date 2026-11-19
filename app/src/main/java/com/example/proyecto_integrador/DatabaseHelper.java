@@ -9,7 +9,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "ConsultorioDental.db";
-    private static final int DATABASE_VERSION = 8; // Versión 8 para creacion de cuentas
+    private static final int DATABASE_VERSION = 9; // Versión 8 para creacion de cuentas
 
     // Nombres de tablas
     public static final String TABLE_USUARIOS = "Usuarios";
@@ -49,6 +49,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("CREATE TABLE " + TABLE_CITAS + " (" +
                 "id_cita INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "id_paciente INTEGER, " +
+                "nombre_paciente TEXT, " + // ⬅️ Asegúrate de tener este campo
                 "doctor TEXT NOT NULL, " +
                 "fecha TEXT NOT NULL, " +
                 "hora TEXT NOT NULL, " +
@@ -262,9 +263,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return estaOcupado;
     }
 
-    public boolean insertarCita(String doctor, String fecha, String hora, String motivo) {
+    public boolean insertarCita(String nombrePaciente, String doctor, String fecha, String hora, String motivo) {
         SQLiteDatabase db = this.getWritableDatabase();
-        android.content.ContentValues values = new android.content.ContentValues();
+        ContentValues values = new ContentValues();
+        values.put("nombre_paciente", nombrePaciente);
         values.put("doctor", doctor);
         values.put("fecha", fecha);
         values.put("hora", hora);
@@ -393,5 +395,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         int resultado = db.delete(TABLE_INVENTARIO, "id_material = ?", new String[]{String.valueOf(id)});
         return resultado > 0;
+    }
+    public Cursor obtenerCitasPorPaciente(String nombrePaciente) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        // Buscamos las citas que coincidan con el nombre del paciente
+        return db.rawQuery("SELECT * FROM " + TABLE_CITAS + " WHERE nombre_paciente = ?", new String[]{nombrePaciente});
     }
 }
