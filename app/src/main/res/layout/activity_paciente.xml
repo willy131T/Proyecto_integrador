@@ -143,6 +143,41 @@
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
+        <!-- Tarjeta 4: Estado de Cuenta y Pagos -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="4dp"
+            app:cardBackgroundColor="#FFFFFF">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="💳 Estado de Cuenta y Pagos"
+                    android:textColor="#0D9488"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="8dp"/>
+
+                <TextView
+                    android:id="@+id/tvSaldoPacienteInfo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Consultando estado de cuenta..."
+                    android:textColor="#475569"
+                    android:textSize="15sp"
+                    android:lineSpacingExtra="4dp"/>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
         <!-- Botones de Acción Estilizados -->
         <Button
             android:id="@+id/btnAgendarCitaPaciente"
@@ -153,6 +188,18 @@
             android:textStyle="bold"
             android:textColor="#FFFFFF"
             android:backgroundTint="#0284C7"
+            app:cornerRadius="12dp"
+            android:layout_marginBottom="12dp"/>
+
+        <Button
+            android:id="@+id/btnWhatsappClinica"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:text="💬 CONTACTAR POR WHATSAPP"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="#25D366"
             app:cornerRadius="12dp"
             android:layout_marginBottom="16dp"/>
 

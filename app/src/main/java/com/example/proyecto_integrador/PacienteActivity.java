@@ -1,11 +1,14 @@
 package com.example.proyecto_integrador;
 
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import java.util.List;
@@ -16,8 +19,8 @@ import retrofit2.Response;
 
 public class PacienteActivity extends AppCompatActivity {
 
-    private TextView tvBienvenida, tvDatosPaciente, tvTratamiento, tvProximaCita;
-    private Button btnAgendar, btnCerrarSesion;
+    private TextView tvBienvenida, tvDatosPaciente, tvTratamiento, tvProximaCita, tvSaldoPaciente;
+    private Button btnAgendar, btnWhatsapp, btnCerrarSesion;
     private DatabaseHelper dbHelper;
     private String nombreUsuarioLogueado;
 
@@ -32,7 +35,9 @@ public class PacienteActivity extends AppCompatActivity {
         tvDatosPaciente = findViewById(R.id.tvDatosPacienteInfo);
         tvTratamiento = findViewById(R.id.tvTratamientoPacienteInfo);
         tvProximaCita = findViewById(R.id.tvProximaCitaPaciente);
+        tvSaldoPaciente = findViewById(R.id.tvSaldoPacienteInfo);
         btnAgendar = findViewById(R.id.btnAgendarCitaPaciente);
+        btnWhatsapp = findViewById(R.id.btnWhatsappClinica);
         btnCerrarSesion = findViewById(R.id.btnCerrarSesionPaciente);
 
         // Recibimos el usuario logueado
@@ -44,6 +49,14 @@ public class PacienteActivity extends AppCompatActivity {
         cargarDatosUsuario();
         cargarHistorialClinicoPaciente();
         cargarProximaCita();
+        cargarEstadoCuentaPaciente();
+
+        btnWhatsapp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                abrirWhatsAppClinica();
+            }
+        });
 
         btnAgendar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -69,6 +82,7 @@ public class PacienteActivity extends AppCompatActivity {
         super.onResume();
         cargarProximaCita();
         cargarHistorialClinicoPaciente();
+        cargarEstadoCuentaPaciente();
     }
 
     private void cargarDatosUsuario() {
@@ -238,5 +252,54 @@ public class PacienteActivity extends AppCompatActivity {
                 .setMessage(sb.toString())
                 .setPositiveButton("Cerrar", null)
                 .show();
+    }
+
+    private void cargarEstadoCuentaPaciente() {
+        RetrofitClient.getApiService().obtenerPagosPaciente(nombreUsuarioLogueado).enqueue(new Callback<Map<String, Object>>() {
+            @Override
+            public void onResponse(Call<Map<String, Object>> call, Response<Map<String, Object>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    Object pagadoObj = response.body().get("total_pagado");
+                    Object pendObj = response.body().get("saldo_pendiente");
+                    double pagado = pagadoObj instanceof Number ? ((Number) pagadoObj).doubleValue() : 0.0;
+                    double pendiente = pendObj instanceof Number ? ((Number) pendObj).doubleValue() : 0.0;
+
+                    StringBuilder sb = new StringBuilder();
+                    sb.append(String.format("✅ Total Pagado: $%.2f MXN\n", pagado));
+                    sb.append(String.format("⏳ Saldo Pendiente: $%.2f MXN\n", pendiente));
+
+                    List<Map<String, Object>> lista = (List<Map<String, Object>>) response.body().get("pagos");
+                    if (lista != null && !lista.isEmpty()) {
+                        sb.append("\nÚltimos movimientos:\n");
+                        int max = Math.min(lista.size(), 3);
+                        for (int i = 0; i < max; i++) {
+                            Map<String, Object> p = lista.get(i);
+                            sb.append("• ").append(p.get("concepto"))
+                              .append(" ($").append(p.get("monto")).append(" - ")
+                              .append(p.get("estado")).append(")\n");
+                        }
+                    }
+                    tvSaldoPaciente.setText(sb.toString().trim());
+                    return;
+                }
+                tvSaldoPaciente.setText("Sin conexión con el servidor. Consulta tu saldo en recepción.");
+            }
+
+            @Override
+            public void onFailure(Call<Map<String, Object>> call, Throwable t) {
+                tvSaldoPaciente.setText("Modo sin conexión: consulta tu estado de cuenta al conectarte a internet.");
+            }
+        });
+    }
+
+    private void abrirWhatsAppClinica() {
+        String mensaje = "Hola, soy " + nombreUsuarioLogueado + ". Me comunico desde OdontoCloud para consultar sobre mi cita/saldo.";
+        String url = "https://wa.me/525551234567?text=" + Uri.encode(mensaje);
+        try {
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+            startActivity(intent);
+        } catch (ActivityNotFoundException e) {
+            Toast.makeText(this, "No se encontró una aplicación para abrir WhatsApp.", Toast.LENGTH_SHORT).show();
+        }
     }
 }

@@ -49,4 +49,8 @@ public interface ApiService {
 
     @POST("api/pacientes/{nombre}/diagnosticos")
     Call<Map<String, Object>> registrarDiagnostico(@Path("nombre") String nombre, @Body Map<String, Object> diagData);
+
+    // 4. Pagos y Saldos
+    @GET("api/pagos/paciente/{nombre}")
+    Call<Map<String, Object>> obtenerPagosPaciente(@Path("nombre") String nombre);
 }
